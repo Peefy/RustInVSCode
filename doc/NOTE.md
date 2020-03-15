@@ -517,7 +517,7 @@ fn main() {
 
 #### 使用if的let语句
 
-因为if是表达式，所以我们可以在let 语句的右侧使用它，
+因为if是表达式，所以可以在let 语句的右侧使用它，
 
 ```rust
 fn main() {
@@ -546,7 +546,7 @@ fn main() {
 
 ##### 从循环返回值
 
-a的用途之一loop是重试您知道可能会失败的操作，例如检查线程是否已完成其工作。但是，您可能需要将该操作的结果传递给其余代码。为此，您可以在break停止循环的表达式后添加要返回的值。该值将从循环中返回，因此您可以使用它，如下所示：
+a的用途之一loop是重试知道可能会失败的操作，例如检查线程是否已完成其工作。但是，可能需要将该操作的结果传递给其余代码。为此，可以在break停止循环的表达式后添加要返回的值。该值将从循环中返回，因此可以使用它，如下所示：
 
 ```rust
 fn main() {
@@ -566,7 +566,7 @@ fn main() {
 
 ##### 有条件循环 while
 
-对于程序而言，在循环中评估条件通常很有用。当条件为真时，循环运行。当条件不再为真时，程序将调用break，从而停止循环。这个环型可使用的组合来实现loop，if，else，和break; 您可以根据需要在程序中立即尝试。
+对于程序而言，在循环中评估条件通常很有用。当条件为真时，循环运行。当条件不再为真时，程序将调用break，从而停止循环。这个环型可使用的组合来实现loop，if，else，和break; 可以根据需要在程序中立即尝试。
 
 ```rust
 fn main() {
@@ -584,7 +584,7 @@ fn main() {
 
 ##### 遍历一个集合 for
 
-您可以使用该while构造遍历集合的元素，例如数组。
+可以使用该while构造遍历集合的元素，例如数组。
 
 ```rust
 fn main() {
@@ -609,7 +609,7 @@ fn main() {
 }
 ```
 
-for循环的安全性和简洁性使其成为Rust中最常用的循环构造。即使在您想要多次运行某些代码的情况下（例如while清单3-3 中使用循环的倒计时示例），大多数Rustaceans也会使用for循环。这样做的方法是使用Range，这是标准库提供的一种类型，它按顺序生成所有数字，从一个数字开始到另一个数字之前结束。
+for循环的安全性和简洁性使其成为Rust中最常用的循环构造。即使在想要多次运行某些代码的情况下（例如while清单3-3 中使用循环的倒计时示例），大多数Rustaceans也会使用for循环。这样做的方法是使用Range，这是标准库提供的一种类型，它按顺序生成所有数字，从一个数字开始到另一个数字之前结束。
 
 ```rust
 fn main() {
@@ -621,3 +621,840 @@ fn main() {
 ```
 
 ### Rust所有权
+
+Rust的主要特征是所有权。尽管该功能易于解释，但对其余语言有深远的影响。
+
+所有程序必须在运行时管理它们使用计算机内存的方式。某些语言具有垃圾回收功能，该垃圾回收功能会在程序运行时不断寻找不再使用的内存。在其他语言中，程序员必须显式分配和释放内存。Rust使用第三种方法：通过所有权系统管理内存，该系统具有一组在编译时检查的规则。程序运行时，所有所有权功能都不会减慢其运行速度。
+
+因为所有权是许多程序员的新概念，所以它确实需要一些时间来习惯。好消息是，对Rust和所有权系统的规则越有经验，就越能自然开发安全有效的代码。继续吧！
+
+了解所有权后，将拥有坚实的基础，可以理解使Rust独树一帜的功能。在本章中，将通过一些针对非常常见的数据结构的示例来学习所有权：字符串。
+
+在许多编程语言中，不必经常考虑堆栈和堆。但是在像Rust这样的系统编程语言中，值是在堆栈上还是在堆上对语言的行为以及为什么必须做出某些决定的影响更大。所有权的各个部分将在本章后面的堆栈和堆中进行介绍，因此这里是准备工作的简要说明。
+
+堆栈和堆都是内存的一部分，的代码可在运行时使用，但是它们的结构不同。堆栈按获取值的顺序存储值，并以相反的顺序删除值。这称为后进先出。想想一堆盘子：添加更多盘子时，将它们放在堆的顶部，而当需要盘子时，从顶部取下一个盘子。从中间或底部添加或删除板都无法正常工作！添加数据称为压入堆栈，而删除数据称为弹出堆栈。
+
+堆栈中存储的所有数据必须具有已知的固定大小。编译时大小未知或大小可能更改的数据必须存储在堆中。堆的组织性较差：将数据放在堆上时，需要一定数量的空间。操作系统在堆中找到一个足够大的空白点，将其标记为正在使用中，然后返回一个 指针，该指针是该位置的地址。此过程称为 在堆上分配，有时也简称为allocating。将值压入堆栈不被视为分配。由于指针是已知的固定大小，因此可以将指针存储在堆栈上，但是当需要实际数据时，必须遵循指针。
+
+#### Rust所有权规则
+
+* Rust中的每个值都有一个变量，称为其所有者。
+* 一次只能有一个所有者。
+* 当所有者超出范围时，该值将被删除
+
+可以改变的字符串
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let mut s = String::from("hello");
+
+s.push_str(", world!"); // push_str() appends a literal to a String
+
+println!("{}", s); // This will print `hello, world!`
+}
+
+```
+
+#### 内存和分配
+
+对于字符串文字，在编译时就知道了内容，因此文本直接硬编码到最终的可执行文件中。这就是为什么字符串文字快速高效的原因。但是这些属性仅来自字符串文字的不变性。不幸的是，对于在编译时未知大小且在运行程序时大小可能会改变的每段文本，无法将内存块放入二进制文件中。
+
+**变量与数据交互的方式：克隆**
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let s1 = String::from("hello");
+let s2 = s1.clone();
+
+println!("s1 = {}, s2 = {}", s1, s2);
+}
+
+```
+
+#### Rust可拷贝类型
+
+* 所有整数类型，例如u32。
+* 布尔类型，bool值true和false。
+* 所有浮点类型，例如f64。
+* 字符类型char。
+* 元组（如果它们仅包含also的类型）Copy。例如， (i32, i32)是Copy，但(i32, String)不是。
+
+```rust
+fn main() {
+    let s = String::from("hello");  // s comes into scope
+
+    takes_ownership(s);             // s's value moves into the function...
+                                    // ... and so is no longer valid here
+
+    let x = 5;                      // x comes into scope
+
+    makes_copy(x);                  // x would move into the function,
+                                    // but i32 is Copy, so it’s okay to still
+                                    // use x afterward
+
+} // Here, x goes out of scope, then s. But because s's value was moved, nothing
+  // special happens.
+
+fn takes_ownership(some_string: String) { // some_string comes into scope
+    println!("{}", some_string);
+} // Here, some_string goes out of scope and `drop` is called. The backing
+  // memory is freed.
+
+fn makes_copy(some_integer: i32) { // some_integer comes into scope
+    println!("{}", some_integer);
+} // Here, some_integer goes out of scope. Nothing special happens.
+
+```
+
+#### 返回值和范围
+
+返回值也可以转移所有权。
+
+```rust
+fn main() {
+    let s1 = gives_ownership();         // gives_ownership moves its return
+                                        // value into s1
+
+    let s2 = String::from("hello");     // s2 comes into scope
+
+    let s3 = takes_and_gives_back(s2);  // s2 is moved into
+                                        // takes_and_gives_back, which also
+                                        // moves its return value into s3
+} // Here, s3 goes out of scope and is dropped. s2 goes out of scope but was
+  // moved, so nothing happens. s1 goes out of scope and is dropped.
+
+fn gives_ownership() -> String {             // gives_ownership will move its
+                                             // return value into the function
+                                             // that calls it
+
+    let some_string = String::from("hello"); // some_string comes into scope
+
+    some_string                              // some_string is returned and
+                                             // moves out to the calling
+                                             // function
+}
+
+// takes_and_gives_back will take a String and return one
+fn takes_and_gives_back(a_string: String) -> String { // a_string comes into
+                                                      // scope
+
+    a_string  // a_string is returned and moves out to the calling function
+}
+```
+
+变量的所有权每次都遵循相同的模式：将值分配给另一个变量将其移动。当包含堆上数据的变量超出范围时，将清除该值，drop除非已将数据移至另一个变量所拥有。
+
+拥有所有权然后返回所有功能的所有权有点乏味。如果要让函数使用值而不是所有权怎么办？令人十分烦恼的是，除了可能还想返回的函数主体所产生的任何数据之外，如果想要再次使用它，则还需要将返回的信息传递回去。
+
+可以使用元组返回多个值，
+
+```rust
+fn main() {
+    let s1 = String::from("hello");
+
+    let (s2, len) = calculate_length(s1);
+
+    println!("The length of '{}' is {}.", s2, len);
+}
+
+fn calculate_length(s: String) -> (String, usize) {
+    let length = s.len(); // len() returns the length of a String
+
+    (s, length)
+}
+```
+
+#### Rust引用
+
+```rust
+fn main() {
+    let s1 = String::from("hello");
+
+    let len = calculate_length(&s1);
+
+    println!("The length of '{}' is {}.", s1, len);
+}
+
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}
+```
+
+*注意：使用`&`进行引用的反义词是解引用，这是通过解引用运算符来完成的`*`。*
+
+如果变量在默认情况下是不可变的，引用也是如此，不允许修改引用的内容。
+
+##### 可变引用
+
+```rust
+fn main() {
+    let mut s = String::from("hello");
+
+    change(&mut s);
+}
+
+fn change(some_string: &mut String) {
+    some_string.push_str(", world");
+}
+```
+
+但是可变引用有一个很大的限制：只能在一个特定范围内对一个特定的数据进行一个可变引用。下面代码将失败：
+
+```rust
+let mut s = String::from("hello");
+
+let r1 = &mut s;
+let r2 = &mut s;
+
+println!("{}, {}", r1, r2);
+
+```
+
+该限制允许突变，但是以非常受控的方式。这是新的Rustaceans苦苦挣扎的事情，因为大多数语言都允许随时更改。
+
+具有此限制的好处是Rust可以防止在编译时发生数据争用。一个数据的比赛相似，竞争条件，当这三种行为的发生情况：
+
+* 两个或多个指针同时访问相同的数据。
+* 至少有一个指针用于写入数据。
+* 没有用于同步对数据的访问的机制。
+
+与往常一样，可以使用大括号创建新的范围，从而允许多个可变引用，而不能同时引用：
+
+```rust
+#![allow(unused_variables)]
+fn main() {
+let mut s = String::from("hello");
+
+{
+    let r1 = &mut s;
+
+} // r1 goes out of scope here, so we can make a new reference with no problems.
+
+let r2 = &mut s;
+}
+```
+
+##### 悬空引用
+
+在带有指针的语言中，很容易错误地创建一个悬空指针，即通过在保留指向该内存的指针的同时释放一些内存来引用可能已分配给他人的内存中某个位置的指针。相比之下，在Rust中，编译器保证引用永远不会成为悬挂引用：如果对某些数据具有引用，则编译器将确保数据不会超出对数据的引用范围。
+
+让尝试创建一个悬空的引用，Rust将通过编译时错误防止它：
+
+```rust
+fn main() {
+    let reference_to_nothing = dangle();
+}
+
+fn dangle() -> &String {
+    let s = String::from("hello");
+
+    &s
+}
+```
+
+这是错误:
+
+```rust
+error[E0106]: missing lifetime specifier
+ --> main.rs:5:16
+  |
+5 | fn dangle() -> &String {
+  |                ^ expected lifetime parameter
+  |
+  = help: this function's return type contains a borrowed value, but there is
+  no value for it to be borrowed from
+  = help: consider giving it a 'static lifetime
+```
+
+### Rust切片类型
+
+slice也是另一个没有所有权的数据类型。切片使可以引用集合中连续的元素序列，而不是整个集合。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+fn first_word(s: &String) -> usize {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return i;
+        }
+    }
+
+    s.len()
+}
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let s = String::from("hello world");
+
+let hello = &s[0..5];
+let world = &s[6..11];
+}
+```
+
+这类似于对整体进行引用，`String`但要多加一 `[0..5]`点点。而不是整个参考String，而是对的一部分的参考String。
+
+通过指定`[starting_index..ending_index]`，可以使用方括号内的范围来创建切片 ，其中，`starting_index`是切片中的第一个位置，比切片中`ending_index`的最后一个位置大。在内部，切片数据结构存储切片的起始位置和长度，该长度与`ending_indexminus` 相对应`starting_index`。因此，在的情况下`let world = &s[6..11];`，`world`将是一个切片，该切片包含一个指向第7个字节（从1开始）的指针，其`s`长度值为5。
+
+使用Rust的..range语法，如果要从第一个索引（零）开始，则可以在两个句点之前删除该值。换句话说，这些是相等的：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let s = String::from("hello");
+
+let slice = &s[0..2];
+let slice = &s[..2];
+}
+```
+
+同样，如果的分片包含的最后一个字节，则String可以删除尾随数字。这意味着这些是相等的：
+
+```rust
+#![allow(unused_variables)]
+fn main() {
+let s = String::from("hello");
+
+let len = s.len();
+
+let slice = &s[3..len];
+let slice = &s[3..];
+}
+```
+
+还可以删除两个值以截取整个字符串的一部分。所以这些是相等的：
+
+```rust
+#![allow(unused_variables)]
+fn main() {
+let s = String::from("hello");
+
+let len = s.len();
+
+let slice = &s[0..len];
+let slice = &s[..];
+}
+```
+
+*注意：字符串切片范围索引必须出现在有效的UTF-8字符边界处。如果尝试在多字节字符的中间创建字符串片段，则程序将退出并显示错误。*
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+fn first_word(s: &String) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+
+    &s[..]
+}
+}
+```
+
+```rust
+fn main() {
+    let mut s = String::from("hello world");
+
+    let word = first_word(&s);
+
+    s.clear(); // error!
+
+    println!("the first word is: {}", word);
+}
+```
+
+这是编译器错误：
+
+```rust
+error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
+  --> src/main.rs:18:5
+   |
+16 |     let word = first_word(&s);
+   |                           -- immutable borrow occurs here
+17 |
+18 |     s.clear(); // error!
+   |     ^^^^^^^^^ mutable borrow occurs here
+19 |
+20 |     println!("the first word is: {}", word);
+   |                                       ---- immutable borrow later used here
+```
+
+##### 数组切片
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let a = [1, 2, 3, 4, 5];
+
+let slice = &a[1..3];
+}
+```
+
+该切片具有类型`&[i32]`。通过存储对第一个元素和长度的引用，它的工作方式与字符串切片相同。
+
+### Rust结构
+
+要定义一个结构，输入关键字`struct`并命名整个结构。结构的名称应说明将数据分组在一起的重要性。然后，在大括号内，定义数据段的名称和类型，将其称为field。
+
+```rust
+#![allow(unused_variables)]
+fn main() {
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+}
+```
+
+要在定义结构后使用结构，可以通过为每个字段指定具体值来创建该结构的实例。通过说明结构的名称来创建实例，然后添加包含`key: value`对的大括号，其中键是字段的名称，值是要存储在这些字段中的数据。不必按照在结构中声明它们的顺序来指定字段。换句话说，结构定义就像该类型的通用模板，实例用特定的数据填充该模板以创建该类型的值。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+
+let mut user1 = User {
+    email: String::from("someone@example.com"),
+    username: String::from("someusername123"),
+    active: true,
+    sign_in_count: 1,
+};
+
+user1.email = String::from("anotheremail@example.com");
+}
+
+```
+
+#### 使用结构更新语法从其他实例创建实例
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+
+let user1 = User {
+    email: String::from("someone@example.com"),
+    username: String::from("someusername123"),
+    active: true,
+    sign_in_count: 1,
+};
+
+let user2 = User {
+    email: String::from("another@example.com"),
+    username: String::from("anotherusername567"),
+    ..user1
+};
+}
+```
+
+#### 使用没有命名字段的元组结构创建不同的类型
+
+还可以定义看起来类似于元组的结构，称为元组结构。元组结构具有附加的含义，即结构名称提供的含义，但没有与其字段关联的名称；相反，它们只是字段的类型。当想给整个元组起一个名字并使元组成为与其他元组不同的类型时，元组结构很有用，并且像常规结构中那样命名每个字段都是冗长或多余的。
+
+要定义元组结构，请从`struct`关键字和结构名称开始，后跟元组中的类型。例如，以下是两个名为`Color`和的元组结构的定义和用法`Point`：
+
+```rust
+#![allow(unused_variables)]
+fn main() {
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+let black = Color(0, 0, 0);
+let origin = Point(0, 0, 0);
+}
+```
+
+请注意，`black`和`origin`值是不同的类型，因为它们是不同元组结构的实例。您定义的每个结构都是其自己的类型，即使该结构中的字段具有相同的类型。例如，即使两个类型都由三个值组成，`Color`带有类型参数的函数也不能将a `Point`作为参数`i32`。否则，元组`struct`实例的行为类似于元组：您可以将它们分解为各自的片段，可以使用.后跟索引的索引来访问单个值，依此类推。
+
+#### 没有任何字段的类似单元的结构
+
+您还可以定义没有任何字段的结构！这些之所以称为 单元状结构，是因为它们的行为类似于`()`单元类型。在需要在某种类型上实现特征但又不想在类型本身中存储任何数据的情况下，类似单元的结构很有用。
+
+```rust
+struct User {
+    username: &str,
+    email: &str,
+    sign_in_count: u64,
+    active: bool,
+}
+
+fn main() {
+    let user1 = User {
+        email: "someone@example.com",
+        username: "someusername123",
+        active: true,
+        sign_in_count: 1,
+    };
+}
+```
+
+#### 使用结构的示例
+
+```rust
+fn main() {
+    let width1 = 30;
+    let height1 = 50;
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area(width1, height1)
+    );
+}
+
+fn area(width: u32, height: u32) -> u32 {
+    width * height
+}
+```
+
+```rust
+fn main() {
+    let rect1 = (30, 50);
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area(rect1)
+    );
+}
+
+fn area(dimensions: (u32, u32)) -> u32 {
+    dimensions.0 * dimensions.1
+}
+```
+
+```rust
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        area(&rect1)
+    );
+}
+
+fn area(rectangle: &Rectangle) -> u32 {
+    rectangle.width * rectangle.height
+}
+```
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!("rect1 is {:?}", rect1);
+}
+```
+
+### Rust方法
+
+方法类似于函数：它们用fn关键字及其名称声明，它们可以具有参数和返回值，并且它们包含一些从其他地方调用它们时将运行的代码。但是，方法与函数的不同之处在于，它们是在struct的上下文中定义的，并且它们的第一个参数始终为self，它表示调用该方法的struct实例。
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()
+    );
+}
+```
+
+```rust
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+    let rect2 = Rectangle { width: 10, height: 40 };
+    let rect3 = Rectangle { width: 60, height: 45 };
+
+    println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect2));
+    println!("Can rect1 hold rect3? {}", rect1.can_hold(&rect3));
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+}
+```
+
+的另一个有用的功能`impl`块的是，我们能定义范围内的功能impl块是不带self作为参数。这些被称为关联函数，因为它们与结构关联。它们仍然是函数，而不是方法，因为它们没有可使用的结构实例。您已经使用了String::from关联的功能。
+
+关联函数通常用于将返回该结构的新实例的构造函数。例如，我们可以提供一个关联的函数，该函数将具有一个维度参数并将其用作宽度和高度，从而使创建正方形Rectangle而不是必须两次指定相同的值变得更加容易：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn square(size: u32) -> Rectangle {
+        Rectangle { width: size, height: size }
+    }
+}
+}
+```
+
+每个结构允许具有多个`impl`块。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+}
+
+```
+
+### Rust枚举和模式匹配
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum IpAddrKind {
+    V4,
+    V6,
+}
+}
+```
+
+我们可以`IpAddrKind`像这样创建两个变体的每一个的实例：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum IpAddrKind {
+    V4,
+    V6,
+}
+
+let four = IpAddrKind::V4;
+let six = IpAddrKind::V6;
+}
+```
+
+请注意，枚举的变体在其标识符下命名空间，并且我们使用双冒号将两者分开。之所以有用，是因为现在两个值`IpAddrKind::V4`和`IpAddrKind::V6`都具有相同的类型： `IpAddrKind`。例如，我们然后可以定义一个接受任意值的函数 `IpAddrKind`：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum IpAddrKind {
+    V4,
+    V6,
+}
+
+fn route(ip_kind: IpAddrKind) { }
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum IpAddrKind {
+    V4,
+    V6,
+}
+
+struct IpAddr {
+    kind: IpAddrKind,
+    address: String,
+}
+
+let home = IpAddr {
+    kind: IpAddrKind::V4,
+    address: String::from("127.0.0.1"),
+};
+
+let loopback = IpAddr {
+    kind: IpAddrKind::V6,
+    address: String::from("::1"),
+};
+}
+```
+
+通过将数据直接放入每个枚举变量中，我们可以仅使用枚举而不是结构内部的枚举以更简洁的方式表示相同的概念。这个新的`IpAddr`枚举定义表示`V4`和`V6` 变体都将具有关联的`String`值：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum IpAddr {
+    V4(String),
+    V6(String),
+}
+
+let home = IpAddr::V4(String::from("127.0.0.1"));
+
+let loopback = IpAddr::V6(String::from("::1"));
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct QuitMessage; // unit struct
+struct MoveMessage {
+    x: i32,
+    y: i32,
+}
+struct WriteMessage(String); // tuple struct
+struct ChangeColorMessage(i32, i32, i32); // tuple struct
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+impl Message {
+    fn call(&self) {
+        // method body would be defined here
+    }
+}
+
+let m = Message::Write(String::from("hello"));
+m.call();
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum Option<T> {
+    Some(T),
+    None,
+}
+}
+```
+
+该`Option<T>`枚举是非常有用，它甚至包括中拉开序幕; 您无需将其明确纳入范围。此外，它的变体也是如此：您可以直接使用`Some`和`None`不带`Option::`前缀。该 `Option<T>`枚举仍然只是一个普通的枚举，并`Some(T)`和`None`类型仍然变种`Option<T>`。
+
+该`<T>`语法是，我们还没有谈到尚锈的特点。这是一个泛型类型参数，我们将在第10章中更详细地介绍泛型。现在，您只需要知道，这`<T>`意味着枚举的Some变体 Option可以容纳任何类型的数据。以下是一些使用Option值保存数字类型和字符串类型的示例：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let some_number = Some(5);
+let some_string = Some("a string");
+
+let absent_number: Option<i32> = None;
+}
+
+```
