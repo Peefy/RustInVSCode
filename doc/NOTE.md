@@ -1458,3 +1458,324 @@ let absent_number: Option<i32> = None;
 }
 
 ```
+
+#### Rust控制流运算符match
+
+Rust具有一个非常强大的控制流运算符match，该运算符使您可以将值与一系列模式进行比较，然后根据匹配的模式执行代码。模式可以由文字值，变量名，通配符和许多其他内容组成；
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter,
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter => 25,
+    }
+}
+}
+```
+
+##### 搭配Option<T>
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+fn plus_one(x: Option<i32>) -> Option<i32> {
+    match x {
+        None => None,
+        Some(i) => Some(i + 1),
+    }
+}
+
+let five = Some(5);
+let six = plus_one(five);
+let none = plus_one(None);
+}
+
+```
+
+##### `_`占位符
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let some_u8_value = 0u8;
+match some_u8_value {
+    1 => println!("one"),
+    3 => println!("three"),
+    5 => println!("five"),
+    7 => println!("seven"),
+    _ => (),
+}
+}
+
+```
+
+### Rust模块
+
+文件src.lib.rs
+
+```rust
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+    }
+}
+
+pub fn eat_at_restaurant() {
+    // Absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    // Relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+
+```
+
+#### 使用pub关键字公开路径
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        fn add_to_waitlist() {}
+    }
+}
+
+pub fn eat_at_restaurant() {
+    // Absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    // Relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+
+```
+
+#### 起始相对路径 super
+
+```rust
+fn serve_order() {}
+
+mod back_of_house {
+    fn fix_incorrect_order() {
+        cook_order();
+        super::serve_order();
+    }
+
+    fn cook_order() {}
+}
+fn main() {}
+
+```
+
+#### 公开结构和枚举
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+mod back_of_house {
+    pub struct Breakfast {
+        pub toast: String,
+        seasonal_fruit: String,
+    }
+
+    impl Breakfast {
+        pub fn summer(toast: &str) -> Breakfast {
+            Breakfast {
+                toast: String::from(toast),
+                seasonal_fruit: String::from("peaches"),
+            }
+        }
+    }
+}
+
+pub fn eat_at_restaurant() {
+    // Order a breakfast in the summer with Rye toast
+    let mut meal = back_of_house::Breakfast::summer("Rye");
+    // Change our mind about what bread we'd like
+    meal.toast = String::from("Wheat");
+    println!("I'd like {} toast please", meal.toast);
+
+    // The next line won't compile if we uncomment it; we're not allowed
+    // to see or modify the seasonal fruit that comes with the meal
+    // meal.seasonal_fruit = String::from("blueberries");
+}
+}
+
+```
+
+#### 使用use关键字将路径纳入范围
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+fn main() {}
+
+```
+
+还可以通过`use`和相对路径将某项纳入范围。
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+fn main() {}
+
+```
+
+#### 创建惯用use路径
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting::add_to_waitlist;
+
+pub fn eat_at_restaurant() {
+    add_to_waitlist();
+    add_to_waitlist();
+    add_to_waitlist();
+}
+fn main() {}
+
+```
+
+#### 使用as关键字提供新名称
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::fmt::Result;
+use std::io::Result as IoResult;
+
+fn function1() -> Result {
+    // --snip--
+    Ok(())
+}
+
+fn function2() -> IoResult<()> {
+    // --snip--
+    Ok(())
+}
+}
+
+```
+
+用以下方式重新导出名称 pub use,当我们使用use关键字将名称带入范围时，新范围中可用的名称是私有的。为了使调用我们代码的代码能够像在该代码范围内定义该名称一样引用该名称，我们可以将pub 和组合在一起use。这项技术称为重新导出，因为我们将某个项目纳入范围，同时也使该项目可供其他人进入其范围。
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+fn main() {}
+
+```
+
+通过使用pub use，外部代码现在可以add_to_waitlist使用调用该函数hosting::add_to_waitlist。如果未指定pub use，则该 eat_at_restaurant函数可以hosting::add_to_waitlist在其作用域内调用，但是外部代码无法利用此新路径。
+
+当代码的内部结构与调用代码的程序员对域的思考方式不同时，重新导出很有用。
+
+#### 使用外部软件包
+
+该项目使用一个名为的外部软件包rand来获取随机数。要rand在我们的项目中使用，我们将此行添加到Cargo.toml中：
+
+```toml
+[dependencies]
+rand = "0.5.5"
+
+```
+
+```rust
+use rand::Rng;
+fn main() {
+    let secret_number = rand::thread_rng().gen_range(1, 101);
+}
+
+```
+
+Rust社区的成员已经在crates.io上提供了许多软件包 ，
+
+#### 使用嵌套路径清理大use列表
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::{cmp::Ordering, io};
+// ---snip---
+}
+
+```
+
+这两个路径的共同部分是std::io，这就是完整的第一个路径。要将这两个路径合并为一条use语句，我们可以使用self嵌套路径，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io::{self, Write};
+}
+r4
+```
+
+#### 全局运算符
+
+如果要将路径中定义的所有公共项目都纳入范围，可以指定该路径，后跟*，全局运算符：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::collections::*;
+}
+```
+
+### 用向量存储值列表
