@@ -317,9 +317,9 @@ fn main() {
 }
 ```
 
-当希望将数据分配在堆栈而不是堆上时（当在第4章中讨论堆栈和堆时），或者要确保始终拥有固定数量的元素时，数组很有用。但是，数组不像矢量类型那样灵活。载体是由标准库提供一个类似集合类型是允许生长或尺寸的缩小。如果不确定使用数组还是向量，则可能应该使用向量。第8章将更详细地讨论向量。
+当希望将数据分配在堆栈而不是堆上时（当在第4章中讨论堆栈和堆时），或者要确保始终拥有固定数量的元素时，数组很有用。但是，数组不像矢量类型那样灵活。载体是由标准库提供一个类似集合类型是允许生长或尺寸的缩小。如果不确定使用数组还是容器，则可能应该使用容器。
 
-一个程序可能需要使用数组而不是向量，例如，该程序需要知道一年中各个月份的名称。这样的程序不太可能需要添加或删除月份，因此可以使用数组，因为知道它将始终包含12个元素：
+一个程序可能需要使用数组而不是容器，例如，该程序需要知道一年中各个月份的名称。这样的程序不太可能需要添加或删除月份，因此可以使用数组，因为知道它将始终包含12个元素：
 
 ```rust
 
@@ -1778,4 +1778,593 @@ use std::collections::*;
 }
 ```
 
-### 用向量存储值列表
+### 用容器存储值列表
+
+我们要研究的第一个集合类型是容器`Vec<T>`。容器使您可以在单个数据结构中存储多个值，该结构将所有值彼此相邻放置在内存中。
+
+要创建一个新的空容器，我们可以调用该Vec::new函数，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let v: Vec<i32> = Vec::new();
+}
+
+```
+
+在更实际的代码中，Rust通常可以在插入值后就推断出要存储的值的类型，因此您几乎不需要执行此类型注释。创建`Vec<T>`具有初始值的更为常见，Rust提供了该vec!宏以方便使用。宏将创建一个新容器，其中包含您提供的值。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let v = vec![1, 2, 3];
+}
+```
+
+#### 更新vector
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let mut v = Vec::new();
+
+v.push(5);
+v.push(6);
+v.push(7);
+v.push(8);
+}
+```
+
+#### 删除vector元素
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+{
+    let v = vec![1, 2, 3, 4];
+
+    // do stuff with v
+
+} // <- v goes out of scope and is freed here
+}
+
+```
+
+既然您知道如何创建，更新和销毁容器，那么下一步就是了解如何读取容器的内容。有两种方法可以引用存储在容器中的值。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let v = vec![1, 2, 3, 4, 5];
+
+let third: &i32 = &v[2];
+println!("The third element is {}", third);
+
+match v.get(2) {
+    Some(third) => println!("The third element is {}", third),
+    None => println!("There is no third element."),
+}
+}
+```
+
+Rust有两种引用元素的方式，因此您可以选择在尝试使用向量没有元素的索引值时程序的行为。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let v = vec![1, 2, 3, 4, 5];
+
+let does_not_exist = &v[100];
+let does_not_exist = v.get(100);
+}
+
+```
+
+#### 遍历容器中的值
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let v = vec![100, 32, 57];
+for i in &v {
+    println!("{}", i);
+}
+}
+```
+
+#### 迭代对向量中元素的可变引用
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let mut v = vec![100, 32, 57];
+for i in &mut v {
+    *i += 50;
+}
+}
+```
+
+#### 定义将一个enum不同类型的值存储在一个向量中
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum SpreadsheetCell {
+    Int(i32),
+    Float(f64),
+    Text(String),
+}
+
+let row = vec![
+    SpreadsheetCell::Int(3),
+    SpreadsheetCell::Text(String::from("blue")),
+    SpreadsheetCell::Float(10.12),
+];
+}
+
+```
+
+### Rust字符串
+
+从new创建字符串的函数
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let mut s = String::new();
+}
+```
+
+#### 使用该to_string方法String从字符串文字创建一个
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let data = "initial contents";
+
+let s = data.to_string();
+
+// the method also works on a literal directly:
+let s = "initial contents".to_string();
+}
+
+```
+
+字符串是UTF-8编码的，因此我们可以在其中包含任何正确编码的数据，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let hello = String::from("السلام عليكم");
+let hello = String::from("Dobrý den");
+let hello = String::from("Hello");
+let hello = String::from("שָׁלוֹם");
+let hello = String::from("नमस्ते");
+let hello = String::from("こんにちは");
+let hello = String::from("안녕하세요");
+let hello = String::from("你好");
+let hello = String::from("Olá");
+let hello = String::from("Здравствуйте");
+let hello = String::from("Hola");
+}
+```
+
+**更新字符串**
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let mut s = String::from("foo");
+s.push_str("bar");
+}
+
+```
+
+**与+运算符或format!宏串联**
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let s1 = String::from("Hello, ");
+let s2 = String::from("world!");
+let s3 = s1 + &s2; // note s1 has been moved here and can no longer be used
+}
+
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let s1 = String::from("tic");
+let s2 = String::from("tac");
+let s3 = String::from("toe");
+
+let s = format!("{}-{}-{}", s1, s2, s3);
+}
+
+```
+
+**遍历字符串**
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+for c in "नमस्ते".chars() {
+    println!("{}", c);
+}
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+for b in "नमस्ते".bytes() {
+    println!("{}", b);
+}
+}
+
+```
+
+### Rust哈希
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+}
+
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::collections::HashMap;
+
+let teams  = vec![String::from("Blue"), String::from("Yellow")];
+let initial_scores = vec![10, 50];
+
+let scores: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
+}
+
+```
+
+**哈希和所有权**
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::collections::HashMap;
+
+let field_name = String::from("Favorite color");
+let field_value = String::from("Blue");
+
+let mut map = HashMap::new();
+map.insert(field_name, field_value);
+// field_name and field_value are invalid at this point, try using them and
+// see what compiler error you get!
+}
+
+```
+
+**访问遍历哈希的值**
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+
+let team_name = String::from("Blue");
+let score = scores.get(&team_name);
+}
+
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+
+for (key, value) in &scores {
+    println!("{}: {}", key, value);
+}
+}
+
+```
+
+通常检查特定键是否具有值，如果没有，请为其插入值。哈希映射为此有一个特殊的API entry ，它将想要检查的键作为参数。该entry方法的返回值 是一个称为的枚举Entry，表示可能存在或可能不存在的值。假设我们要检查Yellow团队的密钥是否具有与其关联的值。如果不是，我们要插入值50，蓝色团队也要插入值50。使用entryAPI，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+scores.insert(String::from("Blue"), 10);
+
+scores.entry(String::from("Yellow")).or_insert(50);
+scores.entry(String::from("Blue")).or_insert(50);
+
+println!("{:?}", scores);
+}
+
+```
+
+**根据旧值更新值**
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::collections::HashMap;
+
+let text = "hello world wonderful world";
+
+let mut map = HashMap::new();
+
+for word in text.split_whitespace() {
+    let count = map.entry(word).or_insert(0);
+    *count += 1;
+}
+
+println!("{:?}", map);
+}
+
+```
+
+#### Rust散列函数
+
+默认情况下，HashMap使用“加密强度高”的1哈希函数，该函数可以抵抗拒绝服务（DoS）攻击。这不是可用的最快的哈希算法，但是性能下降带来的更好安全性的权衡是值得的。如果您对代码进行概要分析并发现默认的哈希函数对于您的目的而言太慢，则可以通过指定其他hasher来切换到另一个函数 。散列器是实现BuildHasher特征的一种类型。
+
+### Rust错误处理
+
+panic!宏引发错误
+
+#### 可恢复错误Result
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(error) => {
+            panic!("Problem opening the file: {:?}", error)
+        },
+    };
+}
+
+```
+
+**匹配不同的错误**
+
+```rust
+use std::fs::File;
+use std::io::ErrorKind;
+
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(error) => match error.kind() {
+            ErrorKind::NotFound => match File::create("hello.txt") {
+                Ok(fc) => fc,
+                Err(e) => panic!("Problem creating the file: {:?}", e),
+            },
+            other_error => panic!("Problem opening the file: {:?}", other_error),
+        },
+    };
+}
+
+```
+
+File::open在Err变体内部返回的值的类型为 io::Error，这是标准库提供的结构。该结构具有一个kind我们可以调用以获取io::ErrorKind值的方法。枚举 io::ErrorKind由标准库提供，并且具有表示io 操作可能导致的各种错误的变体。我们要使用的变体是ErrorKind::NotFound，表示我们要打开的文件尚不存在。所以我们匹配f，但我们也有一个内部匹配error.kind()。
+
+我们要检查内部匹配项的条件是，返回的值是否为枚举error.kind()的NotFound变体ErrorKind。如果是这样，我们尝试使用创建文件File::create。但是，由于File::create 也可能失败，因此我们需要在内部match表达式中添加第二个分支。无法创建文件时，将输出其他错误消息。外部的第二个臂match保持不变，因此程序会因缺少文件错误而对任何错误感到错误。
+
+好多match！该match表达式非常有用，但也非常原始。在第13章中，您将学习闭包。该`Result<T, E>`类型具有许多接受闭包并使用match表达式实现的方法 。使用这些方法将使您的代码更简洁。
+
+```rust
+use std::fs::File;
+use std::io::ErrorKind;
+
+fn main() {
+    let f = File::open("hello.txt").unwrap_or_else(|error| {
+        if error.kind() == ErrorKind::NotFound {
+            File::create("hello.txt").unwrap_or_else(|error| {
+                panic!("Problem creating the file: {:?}", error);
+            })
+        } else {
+            panic!("Problem opening the file: {:?}", error);
+        }
+    });
+}
+```
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt").unwrap();
+}
+
+```
+
+expect类似于的另一种方法，unwrap让我们也可以选择 panic!错误消息。使用expect代替unwrap并提供良好的错误消息可以传达您的意图，并使跟踪错误的根源更加容易。
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt").expect("Failed to open hello.txt");
+}
+
+```
+
+**传播错误**
+
+当您编写一个函数的实现调用可能失败的函数时，可以将错误返回给调用代码，以便它可以决定要做什么，而不是处理该函数中的错误。这被称为 传播错误，并赋予了调用代码更多的控制权，在这里，可能有更多的信息或逻辑规定了错误的处理方式，而不是在代码上下文中可用的信息或逻辑。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io;
+use std::io::Read;
+use std::fs::File;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let f = File::open("hello.txt");
+
+    let mut f = match f {
+        Ok(file) => file,
+        Err(e) => return Err(e),
+    };
+
+    let mut s = String::new();
+
+    match f.read_to_string(&mut s) {
+        Ok(_) => Ok(s),
+        Err(e) => Err(e),
+    }
+}
+}
+
+```
+
+**传播错误的捷径：?运算符**
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io;
+use std::io::Read;
+use std::fs::File;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let mut f = File::open("hello.txt")?;
+    let mut s = String::new();
+    f.read_to_string(&mut s)?;
+    Ok(s)
+}
+}
+
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io;
+use std::io::Read;
+use std::fs::File;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let mut s = String::new();
+
+    File::open("hello.txt")?.read_to_string(&mut s)?;
+
+    Ok(s)
+}
+}
+
+```
+
+将文件读入字符串是一个相当常见的操作，因此Rust提供了便捷的fs::read_to_string功能来打开文件，创建新文件 String，读取文件内容，将内容放入文件中String并返回。当然，使用fs::read_to_string不会给我们提供解释所有错误处理的机会，因此我们首先采用了更长的方法。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io;
+use std::fs;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    fs::read_to_string("hello.txt")
+}
+}
+
+```
+
+让我们看看如果?在main函数中使用运算符会发生什么，您会记得它的返回类型为()：
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt")?;
+}
+
+```
+
+```rust
+error[E0277]: the `?` operator can only be used in a function that returns
+`Result` or `Option` (or another type that implements `std::ops::Try`)
+ --> src/main.rs:4:13
+  |
+4 |     let f = File::open("hello.txt")?;
+  |             ^^^^^^^^^^^^^^^^^^^^^^^^ cannot use the `?` operator in a
+  function that returns `()`
+  |
+  = help: the trait `std::ops::Try` is not implemented for `()`
+  = note: required by `std::ops::Try::from_error`
+
+```
+
+该错误指出我们只允许?在返回的函数Result或Option实现的其他类型中 使用运算符std::ops::Try。当您在不返回这些类型之一的函数中编写代码时，并且要?在调用返回其他函数的其他函数时使用Result<T, E>，有两种选择可以解决此问题。一种技术是将函数的返回类型更改为Result<T, E>在没有限制的情况下返回。另一种技术是使用一种match或多种Result<T, E>方法以Result<T, E>适当的方式进行处理。
+
+该main函数是特殊的，并且对它的返回类型必须有限制。main的一种有效返回类型是()，并且方便地，另一种有效返回类型是Result<T, E>，如下所示：
+
+```rust
+use std::error::Error;
+use std::fs::File;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let f = File::open("hello.txt")?;
+
+    Ok(())
+}
+```
+
+该`Box<dyn Error>`类型称为特征对象，
