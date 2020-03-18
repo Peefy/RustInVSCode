@@ -2368,3 +2368,499 @@ fn main() -> Result<(), Box<dyn Error>> {
 ```
 
 该`Box<dyn Error>`类型称为特征对象，
+
+### 是否使用panic!函数
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::net::IpAddr;
+
+let home: IpAddr = "127.0.0.1".parse().unwrap();
+}
+
+```
+
+IpAddr通过解析硬编码字符串来创建实例。可以看到这127.0.0.1是一个有效的IP地址，因此可以在unwrap 此处使用。但是，使用经过硬编码的有效字符串不会更改方法的返回类型parse：仍然会获得一个Result值，并且编译器仍将使能够Result像处理Err变体那样处理该变量，因为编译器不够聪明，无法看到此字符串始终是有效的IP地址。如果IP地址字符串来自用户而不是硬编码到程序中，因此确实有失败的可能性，肯定希望以Result更可靠的方式处理它。
+
+```rust
+loop {
+    // --snip--
+
+    let guess: i32 = match guess.trim().parse() {
+        Ok(num) => num,
+        Err(_) => continue,
+    };
+
+    if guess < 1 || guess > 100 {
+        println!("The secret number will be between 1 and 100.");
+        continue;
+    }
+
+    match guess.cmp(&secret_number) {
+    // --snip--
+}
+
+```
+
+可以创建一个新类型并将验证放入函数中以创建该类型的实例，而不是在所有地方重复进行验证。这样，函数在签名中使用新类型并放心使用其接收的值是安全的。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct Guess {
+    value: i32,
+}
+
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 || value > 100 {
+            panic!("Guess value must be between 1 and 100, got {}.", value);
+        }
+
+        Guess {
+            value
+        }
+    }
+
+    pub fn value(&self) -> i32 {
+        self.value
+    }
+}
+}
+
+```
+
+### 通用类型，特征和寿命
+
+```rust
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let mut largest = number_list[0];
+
+    for number in number_list {
+        if number > largest {
+            largest = number;
+        }
+    }
+
+    println!("The largest number is {}", largest);
+ assert_eq!(largest, 100);
+}
+
+```
+
+```rust
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let mut largest = number_list[0];
+
+    for number in number_list {
+        if number > largest {
+            largest = number;
+        }
+    }
+
+    println!("The largest number is {}", largest);
+
+    let number_list = vec![102, 34, 6000, 89, 54, 2, 43, 8];
+
+    let mut largest = number_list[0];
+
+    for number in number_list {
+        if number > largest {
+            largest = number;
+        }
+    }
+
+    println!("The largest number is {}", largest);
+}
+
+```
+
+```rust
+fn largest<T>(list: &[T]) -> T {
+    let mut largest = list[0];
+
+    for &item in list.iter() {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest(&number_list);
+    println!("The largest number is {}", result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest(&char_list);
+    println!("The largest char is {}", result);
+}
+
+```
+
+如果现在编译此代码，则会收到此错误：
+
+```rust
+error[E0369]: binary operation `>` cannot be applied to type `T`
+ --> src/main.rs:5:12
+  |
+5 |         if item > largest {
+  |            ^^^^^^^^^^^^^^
+  |
+  = note: an implementation of `std::cmp::PartialOrd` might be missing for `T`
+
+```
+
+还可以使用`<>`语法在一个或多个字段中定义结构以使用通用类型参数。
+
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+fn main() {
+    let integer = Point { x: 5, y: 10 };
+    let float = Point { x: 1.0, y: 4.0 };
+}
+
+```
+
+在结构定义中使用泛型的语法类似于在函数定义中使用的语法。首先，在结构名称之后的尖括号内声明类型参数的名称。然后，可以在结构定义中使用泛型类型，否则将指定具体的数据类型。
+
+请注意，因为只用一个泛型类型定义`Point<T>`，这个定义说，`Point<T>`结构是通用在某种类型的T，和田野x，并y有两个同类型的，无论该类型而定。如果创建一个`Point<T>`具有不同类型值的实例，代码将无法编译。
+
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+fn main() {
+    let both_integer = Point { x: 5, y: 10 };
+    let both_float = Point { x: 1.0, y: 4.0 };
+    let integer_and_float = Point { x: 5, y: 4.0 };
+}
+
+```
+
+可以定义枚举以将通用数据类型保存在它们的变量中。看看`Option<T>`和`Result<T, E>`标准库提供的枚举，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum Option<T> {
+    Some(T),
+    None,
+}
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+}
+
+```
+
+**范型方法**
+
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+
+fn main() {
+    let p = Point { x: 5, y: 10 };
+
+    println!("p.x = {}", p.x());
+}
+```
+
+可以仅在`Point<f32>`实例上实现方法，而不能在`Point<T>`具有任何泛型类型的实例上实现方法。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl Point<f32> {
+    fn distance_from_origin(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+}
+
+```
+
+结构定义中的泛型类型参数并不总是与该结构的方法签名中使用的参数相同。例如，
+
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+impl<T, U> Point<T, U> {
+    fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
+        Point {
+            x: self.x,
+            y: other.y,
+        }
+    }
+}
+
+fn main() {
+    let p1 = Point { x: 5, y: 10.4 };
+    let p2 = Point { x: "Hello", y: 'c'};
+
+    let p3 = p1.mixup(p2);
+
+    println!("p3.x = {}, p3.y = {}", p3.x, p3.y);
+}
+
+```
+
+Rust通过在编译时对使用泛型的代码进行单态化来实现这一点。单色化是通过填充编译时使用的具体类型，将通用代码转换为特定代码的过程。
+
+在此过程中，
+
+### 特性：定义共同的行为
+
+类型的行为由可以在该类型上调用的方法组成。如果可以对所有这些类型调用相同的方法，则不同的类型具有相同的行为。特性定义是一种将方法签名组合在一起以定义实现某些目的所需的行为的方法。
+
+举例来说，假设有多种结构，可容纳各种类型和数量的文本：一种NewsArticle结构，可容纳在特定位置归档的新闻报导，并且结构Tweet最多可包含280个字符以及指示它是否为新推文的元数据，转发或回复其他推文。
+
+想要制作一个媒体聚合器库，以显示可能存储在NewsArticle或Tweet实例中的数据摘要。为此，需要每种类型的摘要，并且需要通过summarize在实例上调用方法来请求该摘要 。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+}
+
+```
+
+#### 在类型上实现特质
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self.username, self.content)
+    }
+}
+}
+
+```
+
+#### 特性作为参数
+
+```rust
+pub fn notify(item: impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+```
+
+#### 特性绑定语法
+
+```rust
+pub fn notify<T: Summary>(item: T) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+```
+
+该impl Trait语法是方便，使得在简单的情况下，更简洁的代码。在其他情况下，特征绑定语法可以表示更多的复杂性。例如，可以有两个实现的参数Summary。使用impl Trait语法如下所示：
+
+```rust
+pub fn notify(item1: impl Summary, item2: impl Summary) {
+
+```
+
+或者
+
+```rust
+pub fn notify<T: Summary>(item1: T, item2: T) {
+
+```
+
+**使用+语法指定多个特征界线**
+
+```rust
+pub fn notify(item: impl Summary + Display) {
+
+```
+
+```rust
+pub fn notify<T: Summary + Display>(item: T) {
+
+```
+
+**具有where条款的更清晰的特质界限**
+
+```rust
+fn some_function<T, U>(t: T, u: U) -> i32
+    where T: Display + Clone,
+          U: Clone + Debug
+{
+
+```
+
+还可以impl Trait在返回位置使用语法来返回实现特征的某种类型的值，
+
+```rust
+fn returns_summarizable() -> impl Summary {
+    Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course, as you probably already know, people"),
+        reply: false,
+        retweet: false,
+    }
+}
+
+```
+
+```rust
+fn largest<T: PartialOrd + Copy>(list: &[T]) -> T {
+    let mut largest = list[0];
+
+    for &item in list.iter() {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest(&number_list);
+    println!("The largest number is {}", result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest(&char_list);
+    println!("The largest char is {}", result);
+}
+
+```
+
+过使用与impl使用通用类型参数的块绑定的特征，可以有条件地为实现指定特征的类型实现方法。例如，`Pair<T>`类型始终实现该 new功能。但`Pair<T>`仅实现cmp_display方法，如果其内型T器具的PartialOrd，使比较性状和 所述Display使打印性状。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::fmt::Display;
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self {
+            x,
+            y,
+        }
+    }
+}
+
+impl<T: Display + PartialOrd> Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}", self.x);
+        } else {
+            println!("The largest member is y = {}", self.y);
+        }
+    }
+}
+}
+
+```
+
+对于任何实现了另一个特征的类型，也可以有条件地实现一个特征。满足特征界限的任何类型的特征实现都称为覆盖实现，并且在Rust标准库中得到了广泛的使用。例如，标准库可以在实现 ToString特征的任何类型上实现Display特征。impl 标准库中的块类似于以下代码：
+
+```rust
+impl<T: Display> ToString for T {
+    // --snip--
+}
+
+```
+
+因为标准库具有这种全面的实现，所以可以在实现该特性的任何类型上调用to_string由ToStringtrait 定义的 方法Display。例如，可以String像这样将整数转换为其相应的 值，因为整数实现Display：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let s = 3.to_string();
+}
+
+```
+
+特质和特征边界使可以编写使用通用类型参数减少重复的代码，同时还向编译器指定希望通用类型具有特定行为。然后，编译器可以使用特征绑定信息来检查与的代码一起使用的所有具体类型是否提供正确的行为。在动态类型的语言中，如果在未实现定义该方法的类型的类型上调用方法，则在运行时会出错。但是Rust会将这些错误转移到编译时，因此不得不在代码无法运行之前解决问题。另外，不必编写在运行时检查行为的代码，因为已经在编译时进行了检查。这样做可以提高性能，而不必放弃泛型的灵活性。
+
+### 使用生命周期验证引用
