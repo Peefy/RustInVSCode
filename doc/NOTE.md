@@ -2864,3 +2864,171 @@ let s = 3.to_string();
 特质和特征边界使可以编写使用通用类型参数减少重复的代码，同时还向编译器指定希望通用类型具有特定行为。然后，编译器可以使用特征绑定信息来检查与的代码一起使用的所有具体类型是否提供正确的行为。在动态类型的语言中，如果在未实现定义该方法的类型的类型上调用方法，则在运行时会出错。但是Rust会将这些错误转移到编译时，因此不得不在代码无法运行之前解决问题。另外，不必编写在运行时检查行为的代码，因为已经在编译时进行了检查。这样做可以提高性能，而不必放弃泛型的灵活性。
 
 ### 使用生命周期验证引用
+
+生命周期的主要目的是防止悬而未决的引用，这些引用使程序引用的不是其要引用的数据。考虑下面的程序，它具有一个外部作用域和一个内部作用域。
+
+```rust
+{
+    let r;
+
+    {
+        let x = 5;
+        r = &x;
+    }
+
+    println!("r: {}", r);
+}
+```
+
+外部作用域声明一个r没有初始值的变量，内部作用域声明一个x初始值5 的变量。在内部作用域内，尝试将的值设置r为对的引用x。然后内部作用域结束，尝试在中打印值r。该代码不会编译，因为r在尝试使用该值之前，该值已超出范围。这是错误消息：
+
+```rust
+error[E0597]: `x` does not live long enough
+  --> src/main.rs:7:5
+   |
+6  |         r = &x;
+   |              - borrow occurs here
+7  |     }
+   |     ^ `x` dropped here while still borrowed
+...
+10 | }
+   | - borrowed value needs to live until here
+
+```
+
+#### 借用检查器
+
+Rust编译器有一个借用检查器，可以比较作用域以确定所有借用是否有效。下面代码与上面代码相同，但带有注释，显示了变量的生存期。
+
+```rust
+{
+    let r;                // ---------+-- 'a
+                          //          |
+    {                     //          |
+        let x = 5;        // -+-- 'b  |
+        r = &x;           //  |       |
+    }                     // -+       |
+                          //          |
+    println!("r: {}", r); //          |
+}                         // ---------+
+```
+
+#### 函数的通用生命周期
+
+让编写一个返回两个字符串切片中较长者的函数。此函数将获取两个字符串切片并返回一个字符串切片。实现longest函数后，
+
+```rust
+fn main() {
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
+
+    let result = longest(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+}
+```
+
+#### 终身注释语法
+
+终身注释不会更改任何引用的生存时间。正如签名可以指定通用类型参数时函数可以接受任何类型一样，通过指定通用寿命参数，函数可以接受具有任何生存期的引用。生存期批注描述了多个引用的生存期彼此之间的关系，而不会影响生存期。
+
+生命周期注释的语法略有不同：生命周期参数的名称必须以撇号（'）开头，并且通常都是小写且非常短，就像泛型类型一样。大多数人使用这个名字'a。将生命周期参数注释放置在&引用的后面，并使用空格将注释与引用的类型分开。
+
+以下是一些示例：对i32不带生命周期参数的的引用，对i32具有生命周期参数名为的的'a引用以及i32对也具有生命周期的的可变引用'a。
+
+```rust
+&i32        // a reference
+&'a i32     // a reference with an explicit lifetime
+&'a mut i32 // a mutable reference with an explicit lifetime
+```
+
+#### 方法定义中的生命周期注释
+
+在具有生命周期的结构上实现方法时，使用与清单10-11中所示的泛型类型参数相同的语法。声明和使用生命周期参数的位置取决于它们是否与struct字段或方法参数以及返回值相关。
+
+始终需要在impl 关键字之后声明结构字段的生命周期名称，然后在结构名称之后使用，因为这些生命周期是结构类型的一部分。
+
+在impl块内的方法签名中，引用可能与结构字段中引用的生命周期相关，或者它们可能是独立的。此外，生存期省略规则通常使之成为必需，因此在方法签名中不需要生存期批注。让看一下使用ImportantExcerpt清单10-25中定义的命名结构的一些示例。
+
+首先，将使用名为level的方法，该方法的唯一参数是对的引用， self而返回值是i32，而不是对任何内容的引用：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+impl<'a> ImportantExcerpt<'a> {
+    fn level(&self) -> i32 {
+        3
+    }
+}
+}
+```
+
+impl要求在类型名称后使用生命周期参数声明以及在类型名称后使用它，但是self由于第一个省略规则，不需要注释引用的生命周期。
+
+这是第三个生存期删除规则适用的示例：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+impl<'a> ImportantExcerpt<'a> {
+    fn announce_and_return_part(&self, announcement: &str) -> &str {
+        println!("Attention please: {}", announcement);
+        self.part
+    }
+}
+}
+
+```
+
+有两个输入寿命，所以锈病应用第一生存法则省音并给出了两个&self和announcement自己的寿命。然后，由于参数之一是&self，返回类型的生存期为&self，并且所有生存期均已考虑在内。
+
+#### 静态寿命
+
+需要讨论的一个特殊寿命是'static，这意味着该引用可以在程序的整个过程中有效。所有字符串文字都有'static生命周期，可以如下注释：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let s: &'static str = "I have a static lifetime.";
+}
+
+```
+
+该字符串的文本直接存储在程序的二进制文件中，该二进制文件始终可用。因此，所有字符串文字的生存期为 'static。
+
+可能会'static在错误消息中看到有关使用生存期的建议。但是在指定'static作为参考的生存期之前，请考虑一下所拥有的参考是否真正存在于程序的整个生存期中。可能会考虑是否希望它寿命这么长，即使可以。在大多数情况下，问题是由于尝试创建悬空参考或可用寿命不匹配而导致的。在这种情况下，解决方案将解决这些问题，而不指定'static寿命。
+
+#### 通用类型参数，特质界限和寿命
+
+简要地看一下在一个函数中指定泛型类型参数，特征范围和生存期的语法！
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::fmt::Display;
+
+fn longest_with_an_announcement<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a str
+    where T: Display
+{
+    println!("Announcement! {}", ann);
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+}
+```
+
+### 编写自动化测试
