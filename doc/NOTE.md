@@ -3032,3 +3032,346 @@ fn longest_with_an_announcement<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a st
 ```
 
 ### 编写自动化测试
+
+Edsger W. Dijkstra在1972年的论文“谦虚的程序员”中说：“程序测试可以是显示错误存在的非常有效的方法，但是它不足以显示错误的存在。” 这并不意味着不应该尝试尽可能多地进行测试！
+
+程序中的正确性是的代码按预期执行的程度。Rust的设计高度关注程序的正确性，但是正确性很复杂并且不容易证明。Rust的类型系统承担了很大的负担，但是类型系统无法捕获各种错误。因此，Rust支持使用该语言编写自动软件测试。
+
+例如，假设编写了一个名为的函数add_two，该函数会将传递给它的任何数字加2。该函数的签名接受一个整数作为参数，并返回一个整数作为结果。当实现并编译该函数时，Rust会进行到目前为止所学的所有类型检查和借位检查，以确保例如，不会String对该函数传递值或无效引用。但是Rust 无法检查此函数是否能够准确执行的预期，即返回参数加2而不是参数加10或参数减50！那就是测试的地方。
+
+可以编写测试来断言例如，当传递3给 add_two函数时，返回的值为5。只要对代码进行更改，就可以运行这些测试，以确保任何现有的正确行为都没有更改。
+
+测试是一项复杂的技能：尽管不能在一章中涵盖有关如何编写良好测试的所有细节，但将讨论Rust测试设施的机制。将讨论编写测试时为提供的注释和宏，为运行测试提供的默认行为和选项，以及如何将测试组织为单元测试和集成测试。
+
+测试是Rust函数，用于验证非测试代码是否按预期方式工作。测试功能的主体通常执行以下三个操作：
+
+* 设置任何需要的数据或状态。
+* 运行要测试的代码。
+* 断言结果就是所期望的。
+* 
+让看一下Rust为编写执行这些操作的测试而专门提供的功能，这些测试包括`test`属性，一些宏和 `should_panic`属性。
+
+```rust
+fn main() {}
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+
+```
+
+函数体使用assert_eq!宏声明2 + 2等于4。此声明用作典型测试格式的示例。让运行它以查看此测试是否通过。
+
+该`cargo test`命令运行项目中的所有测试，
+
+```rust
+fn main() {}
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn exploration() {
+        assert_eq!(2 + 2, 4);
+    }
+
+    #[test]
+    fn another() {
+        panic!("Make this test fail");
+    }
+}
+
+```
+
+assert!当要确保测试中的某些条件求和时，标准库提供的宏非常有用true。给 assert!宏一个参数，其结果为布尔值。如果值为 true，assert!则不执行任何操作，测试通过。如果值为false，则assert!宏将调用该panic!宏，这将导致测试失败。使用assert!宏有助于检查代码是否按预期的方式运行。
+
+```rust
+fn main() {}
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+
+```
+
+```rust
+fn main() {}
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+
+```
+
+```rust
+fn main() {}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn larger_can_hold_smaller() {
+        let larger = Rectangle { width: 8, height: 7 };
+        let smaller = Rectangle { width: 5, height: 1 };
+
+        assert!(larger.can_hold(&smaller));
+    }
+}
+
+```
+
+到目前为止，已经编写了在失败时会出现异常的测试。也可以编写使用的测试`Result<T, E>`！这是清单11-1中的测试，被重写为使用`Result<T, E>`并返回a Err而不是异常：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() -> Result<(), String> {
+        if 2 + 2 == 4 {
+            Ok(())
+        } else {
+            Err(String::from("two plus two does not equal four"))
+        }
+    }
+}
+}
+
+```
+
+#### 控制测试的运行方式
+
+就像cargo run编译代码然后运行生成的二进制文件一样， cargo test在测试模式下编译代码并运行生成的测试二进制文件。可以指定命令行选项来更改的默认行为 cargo test。例如，生成的二进制文件的默认行为 cargo test是并行运行所有测试，并捕获测试运行期间生成的输出，从而阻止显示输出，并使读取与测试结果相关的输出更加容易。
+
+有些命令行选项转到cargo test，有些转到生成的测试二进制文件。要分隔这两种类型的参数，请列出要传递的参数，cargo test后跟分隔符--，然后列出要传递至测试二进制文件的参数。运行cargo test --help显示可以使用的选项cargo test，运行cargo test -- --help显示在分隔符之后使用的选项--。
+
+##### 并行或连续运行测试
+
+当运行多个测试时，默认情况下，它们使用线程并行运行。这意味着测试将更快地完成运行，因此可以更快地获得有关代码是否正常工作的反馈。由于测试是同时运行的，因此请确保的测试不相互依赖，也不依赖任何共享状态，包括共享环境，例如当前的工作目录或环境变量。
+
+例如，假设的每个测试都运行一些代码，这些代码会在磁盘上创建一个名为test-output.txt的文件，并将一些数据写入该文件。然后，每个测试读取该文件中的数据，并断言该文件包含一个特定值，该值在每个测试中都不同。因为测试是同时运行的，所以在另一个测试写入和读取文件之间，一个测试可能会覆盖文件。然后，第二个测试将失败，这不是因为代码不正确，而是因为在并行运行时测试之间相互干扰。一种解决方案是确保每个测试都写入不同的文件。另一种解决方案是一次运行一次测试。
+
+如果不想并行运行测试，或者想要对使用的线程数进行更细粒度的控制，则可以将--test-threads标志和要使用的线程数发送到测试二进制文件。看下面的例子：
+
+```
+$ cargo test -- --test-threads=1
+```
+
+#### 显示功能输出
+
+默认情况下，如果测试通过，Rust的测试库将捕获打印到标准输出的所有内容。例如，如果调用println!一个测试并且测试通过，则println!在终端中将看不到输出。将仅看到指示测试通过的行。如果测试失败，将在其余失败消息中看到打印到标准输出的所有内容。
+
+例如，清单11-10具有一个傻函数，该函数打印其参数的值并返回10，以及通过和失败的测试。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+fn prints_and_returns_10(a: i32) -> i32 {
+    println!("I got the value {}", a);
+    10
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn this_test_will_pass() {
+        let value = prints_and_returns_10(4);
+        assert_eq!(10, value);
+    }
+
+    #[test]
+    fn this_test_will_fail() {
+        let value = prints_and_returns_10(8);
+        assert_eq!(5, value);
+    }
+}
+}
+```
+
+#### 按名称运行测试子集
+
+有时，运行完整的测试套件可能需要很长时间。如果在特定区域中处理代码，则可能只想运行与该代码有关的测试。可以通过传递cargo test要作为参数运行的测试名称来选择要运行的测试。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub fn add_two(a: i32) -> i32 {
+    a + 2
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn add_two_and_two() {
+        assert_eq!(4, add_two(2));
+    }
+
+    #[test]
+    fn add_three_and_two() {
+        assert_eq!(5, add_two(3));
+    }
+
+    #[test]
+    fn one_hundred() {
+        assert_eq!(102, add_two(100));
+    }
+}
+}
+
+```
+
+#### 运行单项测试
+
+可以传递任何测试函数的名称cargo test以仅运行该测试：
+
+```rust
+$ cargo test one_hundred
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0 secs
+     Running target/debug/deps/adder-06a75b4a1f2515e9
+
+running 1 test
+test tests::one_hundred ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out
+
+```
+
+#### 除非特别要求，否则忽略某些测试
+
+有时执行一些特定的测试可能非常耗时，因此可能希望在大多数运行期间将其排除cargo test。可以使用ignore属性将它们排除在外，而不是将想运行的所有测试都列为参数，如下所示：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+#[test]
+fn it_works() {
+    assert_eq!(2 + 2, 4);
+}
+
+#[test]
+#[ignore]
+fn expensive_test() {
+    // code that takes an hour to run
+}
+}
+
+```
+
+### 测试组织
+
+如本章开头所述，测试是一门复杂的学科，不同的人使用不同的术语和组织。Rust社区从两个主要类别来考虑测试：单元测试和 集成测试。单元测试体积小且重点突出，可以一次单独测试一个模块，并且可以测试专用接口。集成测试完全在的库外部，并且以与其他任何外部代码相同的方式使用的代码，仅使用公共接口，并且每个测试可能使用多个模块。
+
+编写两种测试对于确保库中的各个部分分别或一起执行预期的工作非常重要。
+
+#### 单元测试
+
+单元测试的目的是与其余代码隔离地测试每个代码单元，以快速查明代码在哪里正常工作和不正常工作。将使用它们正在测试的代码将单元测试放在每个文件的src目录中。约定是tests 在每个文件中创建一个命名模块以包含测试功能，并使用对其进行注释 cfg(test)。
+
+##### 测试模块和 `#[cfg(test)]`
+
+该`#[cfg(test)]`测试模块上的注解告诉锈编译只有当你运行运行测试代码cargo test，而不是当你运行cargo build。当只想构建库时，这样可以节省编译时间，并且由于不包括测试，因此可以节省生成的编译工件中的空间。会看到，由于集成测试位于不同的目录中，因此它们不需要`#[cfg(test)]`注释。但是，由于单元测试与代码位于相同的文件中，因此将用于`#[cfg(test)]`指定不应将其包含在编译结果中。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+}
+
+```
+
+此代码是自动生成的测试模块。该属性cfg 代表配置，并告诉Rust仅在具有特定配置选项的情况下才应包括以下项目。在这种情况下，配置选项为test，由Rust提供，用于编译和运行测试。通过使用该cfg属性，仅当使用积极运行测试时，Cargo才会编译测试代码cargo test。除了使用注释的功能外，它还包括此模块中可能包含的所有帮助程序功能`#[test]`。
+
+##### 测试私有功能
+
+在测试社区中，是否应直接测试私有功能存在争论，而其他语言使测试私有功能变得困难或不可能。无论遵循哪种测试思想，Rust的隐私规则都可以让测试私有功能。
+
+```rust
+fn main() {}
+
+pub fn add_two(a: i32) -> i32 {
+    internal_adder(a, 2)
+}
+
+fn internal_adder(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn internal() {
+        assert_eq!(4, internal_adder(2, 2));
+    }
+}
+
+```
+
+#### 整合测试
+
+在Rust中，集成测试完全在的库外部。他们以与其他任何代码相同的方式使用的库，这意味着它们只能调用属于库的公共API的函数。它们的目的是测试库中的许多部分是否可以正常协同工作。单独工作的代码单元在集成时可能会出现问题，因此测试集成代码的覆盖范围也很重要。要创建集成测试，首先需要一个tests目录。
+
+```rust
+use adder;
+
+#[test]
+fn it_adds_two() {
+    assert_eq!(4, adder::add_two(2));
+}
+
+```
+
+##### 集成测试中的子模块
+
+当添加更多集成测试时，可能希望在tests目录中制作多个文件来帮助组织它们。例如，可以按测试功能对测试功能进行分组。如前所述，tests目录中的每个文件都被编译为自己的单独板条箱。
+
+将每个集成测试文件视为自己的板条箱对于创建单独的作用域非常有用，这些范围更像最终用户将使用的板条箱。但是，这意味着tests目录中的文件与src中的文件不具有相同的行为，正如在第7章中了解的有关如何将代码分为模块和文件的知识一样。
+
+当具有一组在多个集成测试文件中有用的帮助程序功能并且尝试按照 第7章的“将模块分为不同的文件”一节中的步骤操作时，tests目录中文件的不同行为最为明显。将它们提取到一个通用模块中。例如，如果创建tests / common.rs并在其中放置一个命名函数，则可以在多个测试文件中添加要从多个测试函数调用的代码：setupsetup
+
+```rust
+use adder;
+
+mod common;
+
+#[test]
+fn it_adds_two() {
+    common::setup();
+    assert_eq!(4, adder::add_two(2));
+}
+
+```
+
+### I/O项目：构建命令行程序
