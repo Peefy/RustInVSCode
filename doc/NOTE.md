@@ -1,6 +1,8 @@
 
 # Rust笔记
 
+[官方中文教程](http://120.78.128.153/rustbook/title-page.html)
+
 ## Rust安装
 
 对于Linux或者macOS，使用终端并运行如下命令：
@@ -1954,7 +1956,7 @@ let hello = String::from("שָׁלוֹם");
 let hello = String::from("नमस्ते");
 let hello = String::from("こんにちは");
 let hello = String::from("안녕하세요");
-let hello = String::from("你好");
+let hello = String::from("好");
 let hello = String::from("Olá");
 let hello = String::from("Здравствуйте");
 let hello = String::from("Hola");
@@ -3293,7 +3295,7 @@ fn expensive_test() {
 
 ##### 测试模块和 `#[cfg(test)]`
 
-该`#[cfg(test)]`测试模块上的注解告诉锈编译只有当你运行运行测试代码cargo test，而不是当你运行cargo build。当只想构建库时，这样可以节省编译时间，并且由于不包括测试，因此可以节省生成的编译工件中的空间。会看到，由于集成测试位于不同的目录中，因此它们不需要`#[cfg(test)]`注释。但是，由于单元测试与代码位于相同的文件中，因此将用于`#[cfg(test)]`指定不应将其包含在编译结果中。
+该`#[cfg(test)]`测试模块上的注解告诉锈编译只有当运行运行测试代码cargo test，而不是当运行cargo build。当只想构建库时，这样可以节省编译时间，并且由于不包括测试，因此可以节省生成的编译工件中的空间。会看到，由于集成测试位于不同的目录中，因此它们不需要`#[cfg(test)]`注释。但是，由于单元测试与代码位于相同的文件中，因此将用于`#[cfg(test)]`指定不应将其包含在编译结果中。
 
 ```rust
 
@@ -4209,7 +4211,7 @@ fn generate_workout(intensity: u32, random_number: u32) {
 
 强制在这些小的匿名函数中注明类型是很恼人的，并且与编译器已知的信息存在大量的重复。
 
-类似于变量，如果相比严格的必要性你更希望增加明确性并变得更啰嗦，可以选择增加类型注解；
+类似于变量，如果相比严格的必要性更希望增加明确性并变得更啰嗦，可以选择增加类型注解；
 
 ```rust
 
@@ -4252,7 +4254,7 @@ let n = example_closure(5);
 
 仍然调用了多于需要的慢计算闭包。解决这个问题的一个方法是在全部代码中的每一个需要多个慢计算闭包结果的地方，可以将结果保存进变量以供复用，这样就可以使用变量而不是再次调用闭包。但是这样就会有很多重复的保存结果变量的地方。
 
-幸运的是，还有另一个可用的方案。可以创建一个存放闭包和调用闭包结果的结构体。该结构体只会在需要结果时执行闭包，并会缓存结果值，这样余下的代码就不必再负责保存结果并可以复用该值。你可能见过这种模式被称 memoization 或 lazy evaluation。
+幸运的是，还有另一个可用的方案。可以创建一个存放闭包和调用闭包结果的结构体。该结构体只会在需要结果时执行闭包，并会缓存结果值，这样余下的代码就不必再负责保存结果并可以复用该值。可能见过这种模式被称 memoization 或 lazy evaluation。
 
 为了让结构体存放闭包，需要指定闭包的类型，因为结构体定义需要知道其每一个字段的类型。每一个闭包实例有其自己独有的匿名类型：也就是说，即便两个闭包有着相同的签名，他们的类型仍然可以被认为是不同。为了定义使用闭包的结构体、枚举或函数参数，需要像第十章讨论的那样使用泛型和 trait bound。
 
@@ -4485,13 +4487,13 @@ error[E0382]: use of moved value: `x`
 
 x 被移动进了闭包，因为闭包使用 move 关键字定义。接着闭包获取了 x 的所有权，同时 main 就不再允许在 println! 语句中使用 x 了。去掉 println! 即可修复问题。
 
-大部分需要指定一个 Fn 系列 trait bound 的时候，可以从 Fn 开始，而编译器会根据闭包体中的情况告诉你是否需要 FnMut 或 FnOnce。
+大部分需要指定一个 Fn 系列 trait bound 的时候，可以从 Fn 开始，而编译器会根据闭包体中的情况告诉是否需要 FnMut 或 FnOnce。
 
 为了展示闭包作为函数参数时捕获其环境的作用，让继续下一个主题：迭代器。
 
 #### 使用迭代器处理元素序列
 
-迭代器模式允许你对一个项的序列进行某些处理。迭代器（iterator）负责遍历序列中的每一项和决定序列何时结束的逻辑。当使用迭代器时，无需重新实现这些逻辑。
+迭代器模式允许对一个项的序列进行某些处理。迭代器（iterator）负责遍历序列中的每一项和决定序列何时结束的逻辑。当使用迭代器时，无需重新实现这些逻辑。
 
 在 Rust 中，迭代器是 惰性的（lazy），这意味着在调用方法使用迭代器之前它都不会有效果。
 
@@ -4571,7 +4573,7 @@ fn iterator_demonstration() {
 
 #### 消费迭代器的方法
 
-Iterator trait 有一系列不同的由标准库提供默认实现的方法；你可以在 Iterator trait 的标准库 API 文档中找到所有这些方法。一些方法在其定义中调用了 next 方法，这也就是为什么在实现 Iterator trait 时要求实现 next 方法的原因。
+Iterator trait 有一系列不同的由标准库提供默认实现的方法；可以在 Iterator trait 的标准库 API 文档中找到所有这些方法。一些方法在其定义中调用了 next 方法，这也就是为什么在实现 Iterator trait 时要求实现 next 方法的原因。
 
 这些调用 next 方法的方法被称为 消费适配器（consuming adaptors），因为调用他们会消耗迭代器。一个消费适配器的例子是 sum 方法。这个方法获取迭代器的所有权并反复调用 next 来遍历迭代器，因而会消费迭代器。当其遍历每一个项时，它将每一个项加总到一个总和并在迭代完成时返回总和。
 
@@ -4997,11 +4999,11 @@ for i in 12..buffer.len() {
 
 在 Rust 中，普通引用和智能指针的一个额外的区别是引用是一类只借用数据的指针；相反，在大部分情况下，智能指针 拥有 他们指向的数据。
 
-实际上本书中已经出现过一些智能指针，比如第八章的 String 和 Vec<T>，虽然当时并不这么称呼它们。这些类型都属于智能指针因为它们拥有一些数据并允许你修改它们。它们也带有元数据（比如他们的容量）和额外的功能或保证（String 的数据总是有效的 UTF-8 编码）。
+实际上本书中已经出现过一些智能指针，比如第八章的 String 和 Vec<T>，虽然当时并不这么称呼它们。这些类型都属于智能指针因为它们拥有一些数据并允许修改它们。它们也带有元数据（比如他们的容量）和额外的功能或保证（String 的数据总是有效的 UTF-8 编码）。
 
 智能指针通常使用结构体实现。智能指针区别于常规结构体的显著特性在于其实现了 Deref 和 Drop trait。Deref trait 允许智能指针结构体实例表现的像引用一样，这样就可以编写既用于引用、又用于智能指针的代码。Drop trait 允许自定义当智能指针离开作用域时运行的代码。本章会讨论这些 trait 以及为什么对于智能指针来说他们很重要。
 
-考虑到智能指针是一个在 Rust 经常被使用的通用设计模式，本章并不会覆盖所有现存的智能指针。很多库都有自己的智能指针而你也可以编写属于你自己的智能指针。这里将会讲到的是来自标准库中最常用的一些：
+考虑到智能指针是一个在 Rust 经常被使用的通用设计模式，本章并不会覆盖所有现存的智能指针。很多库都有自己的智能指针而也可以编写属于自己的智能指针。这里将会讲到的是来自标准库中最常用的一些：
 
 * `Box<T>`，用于在堆上分配值
 * `Rc<T>`，一个引用计数类型，其数据可以有多个所有者
@@ -5009,7 +5011,7 @@ for i in 12..buffer.len() {
 
 #### 使用Box <T>指向堆上的数据
 
-最简单直接的智能指针是 box，其类型是 `Box<T>`。 box 允许你将一个值放在堆上而不是栈上。留在栈上的则是指向堆数据的指针。如果你想回顾一下栈与堆的区别请参考第四章。
+最简单直接的智能指针是 box，其类型是 `Box<T>`。 box 允许将一个值放在堆上而不是栈上。留在栈上的则是指向堆数据的指针。如果想回顾一下栈与堆的区别请参考第四章。
 
 除了数据被储存在堆上而不是栈上之外，box 没有性能损失。不过也没有很多额外的功能。它们多用于如下场景：
 
@@ -5413,7 +5415,7 @@ Drop trait 包含在 prelude 中，所以无需导入它。在 CustomSmartPointe
 
 #### 通过 std::mem::drop 提早丢弃值
 
-不幸的是，并不能直截了当的禁用 drop 这个功能。通常也不需要禁用 drop ；整个 Drop trait 存在的意义在于其是自动处理的。然而，有时你可能需要提早清理某个值。一个例子是当使用智能指针管理锁时；你可能希望强制运行 drop 方法来释放锁以便作用域中的其他代码可以获取锁。Rust 并不允许主动调用 Drop trait 的 drop 方法；当希望在作用域结束之前就强制释放变量的话，应该使用的是由标准库提供的 std::mem::drop。
+不幸的是，并不能直截了当的禁用 drop 这个功能。通常也不需要禁用 drop ；整个 Drop trait 存在的意义在于其是自动处理的。然而，有时可能需要提早清理某个值。一个例子是当使用智能指针管理锁时；可能希望强制运行 drop 方法来释放锁以便作用域中的其他代码可以获取锁。Rust 并不允许主动调用 Drop trait 的 drop 方法；当希望在作用域结束之前就强制释放变量的话，应该使用的是由标准库提供的 std::mem::drop。
 
 Rust 不允许显式调用 drop 因为 Rust 仍然会在 main 的结尾对值自动调用 drop，这会导致一个 double free 错误，因为 Rust 会尝试清理相同的值两次。
 
@@ -5558,7 +5560,7 @@ count after c goes out of scope = 2
 
 #### RefCell<T> 和内部可变性模式
 
-**内部可变性（Interior mutability）**是 Rust 中的一个设计模式，它允许你即使在有不可变引用时改变数据，这通常是借用规则所不允许的。为了改变数据，该模式在数据结构中使用 unsafe 代码来模糊 Rust 通常的可变性和借用规则。还未讲到不安全代码；第十九章会学习它们。当可以确保代码在运行时会遵守借用规则，即使编译器不能保证的情况，可以选择使用那些运用内部可变性模式的类型。所涉及的 unsafe 代码将被封装进安全的 API 中，而外部类型仍然是不可变的。
+**内部可变性（Interior mutability）**是 Rust 中的一个设计模式，它允许即使在有不可变引用时改变数据，这通常是借用规则所不允许的。为了改变数据，该模式在数据结构中使用 unsafe 代码来模糊 Rust 通常的可变性和借用规则。还未讲到不安全代码；第十九章会学习它们。当可以确保代码在运行时会遵守借用规则，即使编译器不能保证的情况，可以选择使用那些运用内部可变性模式的类型。所涉及的 unsafe 代码将被封装进安全的 API 中，而外部类型仍然是不可变的。
 
 ##### 通过 RefCell<T> 在运行时检查借用规则
 
@@ -5571,9 +5573,9 @@ count after c goes out of scope = 2
 
 在编译时检查借用规则的优势是这些错误将在开发过程的早期被捕获同时对没有运行时性能影响，因为所有的分析都提前完成了。为此，在编译时检查借用规则是大部分情况的最佳选择，这也正是其为何是 Rust 的默认行为。
 
-相反在运行时检查借用规则的好处则是允许出现特定内存安全的场景，而它们在编译时检查中是不允许的。静态分析，正如 Rust 编译器，是天生保守的。但代码的一些属性不可能通过分析代码发现：其中最著名的就是 停机问题（Halting Problem），这超出了本书的范畴，不过如果你感兴趣的话这是一个值得研究的有趣主题。
+相反在运行时检查借用规则的好处则是允许出现特定内存安全的场景，而它们在编译时检查中是不允许的。静态分析，正如 Rust 编译器，是天生保守的。但代码的一些属性不可能通过分析代码发现：其中最著名的就是 停机问题（Halting Problem），这超出了本书的范畴，不过如果感兴趣的话这是一个值得研究的有趣主题。
 
-因为一些分析是不可能的，如果 Rust 编译器不能通过所有权规则编译，它可能会拒绝一个正确的程序；从这种角度考虑它是保守的。如果 Rust 接受不正确的程序，那么用户也就不会相信 Rust 所做的保证了。然而，如果 Rust 拒绝正确的程序，虽然会给程序员带来不便，但不会带来灾难。`RefCell<T>` 正是用于当你确信代码遵守借用规则，而编译器不能理解和确定的时候。
+因为一些分析是不可能的，如果 Rust 编译器不能通过所有权规则编译，它可能会拒绝一个正确的程序；从这种角度考虑它是保守的。如果 Rust 接受不正确的程序，那么用户也就不会相信 Rust 所做的保证了。然而，如果 Rust 拒绝正确的程序，虽然会给程序员带来不便，但不会带来灾难。`RefCell<T>` 正是用于当确信代码遵守借用规则，而编译器不能理解和确定的时候。
 
 类似于 `Rc<T>`，`RefCell<T>` 只能用于单线程场景。如果尝试在多线程上下文中使用 `RefCell<T>`，会得到一个编译错误。
 
@@ -5920,7 +5922,7 @@ fn main() {
 
 ##### 避免引用循环：将 Rc<T> 变为 Weak<T>
 
-到目前为止，已经展示了调用 Rc::clone 会增加 `Rc<T>` 实例的 strong_count，和只在其 strong_count 为 0 时才会被清理的 `Rc<T>` 实例。你也可以通过调用 Rc::downgrade 并传递 Rc 实例的引用来创建其值的 弱引用（weak reference）。调用 Rc::downgrade 时会得到 `Weak<T>` 类型的智能指针。不同于将 `Rc<T>` 实例的 strong_count 加一，调用 Rc::downgrade 会将 weak_count 加一。`Rc<T>` 类型使用 weak_count 来记录其存在多少个 `Weak<T>` 引用，类似于 strong_count。其区别在于 weak_count 无需计数为 0 就能使 Rc 实例被清理。
+到目前为止，已经展示了调用 Rc::clone 会增加 `Rc<T>` 实例的 strong_count，和只在其 strong_count 为 0 时才会被清理的 `Rc<T>` 实例。也可以通过调用 Rc::downgrade 并传递 Rc 实例的引用来创建其值的 弱引用（weak reference）。调用 Rc::downgrade 时会得到 `Weak<T>` 类型的智能指针。不同于将 `Rc<T>` 实例的 strong_count 加一，调用 Rc::downgrade 会将 weak_count 加一。`Rc<T>` 类型使用 weak_count 来记录其存在多少个 `Weak<T>` 引用，类似于 strong_count。其区别在于 weak_count 无需计数为 0 就能使 Rc 实例被清理。
 
 强引用代表如何共享 `Rc<T>` 实例的所有权，但弱引用并不属于所有权关系。他们不会造成引用循环，因为任何弱引用的循环会在其相关的强引用计数为 0 时被打断。
 
@@ -5945,7 +5947,7 @@ struct Node {
 }
 ```
 
-希望能够 Node 拥有其子结点，同时也希望通过变量来共享所有权，以便可以直接访问树中的每一个 Node，为此 `Vec<T>` 的项的类型被定义为 `Rc<Node>`。我们还希望能修改其他结点的子结点，所以 children 中 `Vec<Rc<Node>>` 被放进了 `RefCell<T>`。
+希望能够 Node 拥有其子结点，同时也希望通过变量来共享所有权，以便可以直接访问树中的每一个 Node，为此 `Vec<T>` 的项的类型被定义为 `Rc<Node>`。还希望能修改其他结点的子结点，所以 children 中 `Vec<Rc<Node>>` 被放进了 `RefCell<T>`。
 
 接下来，使用此结构体定义来创建一个叫做 leaf 的带有值 3 且没有子结点的 Node 实例，和另一个带有值 5 并以 leaf 作为子结点的实例 branch，如下所示：
 
@@ -5997,11 +5999,11 @@ fn main() {
 
 ```
 
-这里克隆了 leaf 中的 `Rc<Node>` 并储存在了 branch 中，这意味着 leaf 中的 Node 现在有两个所有者：leaf和branch。可以通过 branch.children 从 branch 中获得 leaf，不过无法从 leaf 到 branch。leaf 没有到 branch 的引用且并不知道他们相互关联。我们希望 leaf 知道 branch 是其父结点。稍后我们会这么做。
+这里克隆了 leaf 中的 `Rc<Node>` 并储存在了 branch 中，这意味着 leaf 中的 Node 现在有两个所有者：leaf和branch。可以通过 branch.children 从 branch 中获得 leaf，不过无法从 leaf 到 branch。leaf 没有到 branch 的引用且并不知道他们相互关联。希望 leaf 知道 branch 是其父结点。稍后会这么做。
 
 ###### 增加从子到父的引用
 
-为了使子结点知道其父结点，需要在 Node 结构体定义中增加一个 parent 字段。问题是 parent 的类型应该是什么。我们知道其不能包含 `Rc<T>`，因为这样 leaf.parent 将会指向 branch 而 branch.children 会包含 leaf 的指针，这会形成引用循环，会造成其 strong_count 永远也不会为 0.
+为了使子结点知道其父结点，需要在 Node 结构体定义中增加一个 parent 字段。问题是 parent 的类型应该是什么。知道其不能包含 `Rc<T>`，因为这样 leaf.parent 将会指向 branch 而 branch.children 会包含 leaf 的指针，这会形成引用循环，会造成其 strong_count 永远也不会为 0.
 
 现在换一种方式思考这个关系，父结点应该拥有其子结点：如果父结点被丢弃了，其子结点也应该被丢弃。然而子结点不应该拥有其父结点：如果丢弃子结点，其父结点应该依然存在。这正是弱引用的例子！
 
@@ -6056,7 +6058,7 @@ fn main() {
 
 ```
 
-创建 leaf 结点类似于示例 15-27 中如何创建 leaf 结点的，除了 parent 字段有所不同：leaf 开始时没有父结点，所以我们新建了一个空的 Weak 引用实例。
+创建 leaf 结点类似于示例 15-27 中如何创建 leaf 结点的，除了 parent 字段有所不同：leaf 开始时没有父结点，所以新建了一个空的 Weak 引用实例。
 
 此时，当尝试使用 upgrade 方法获取 leaf 的父结点引用时，会得到一个 None 值。如第一个 println! 输出所示：
 
@@ -6137,3 +6139,1037 @@ fn main() {
 所有这些管理计数和值的逻辑都内建于 `Rc<T>` 和 `Weak<T>` 以及它们的 Drop trait 实现中。通过在 Node 定义中指定从子结点到父结点的关系为一个`Weak<T>`引用，就能够拥有父结点和子结点之间的双向引用而不会造成引用循环和内存泄露。
 
 ### 无畏并发
+
+安全并高效的处理并发编程是 Rust 的另一个主要目标。并发编程（Concurrent programming），代表程序的不同部分相互独立的执行，而 并行编程（parallel programming）代表程序不同部分于同时执行，这两个概念随着计算机越来越多的利用多处理器的优势时显得愈发重要。由于历史原因，在此类上下文中编程一直是困难且容易出错的：Rust 希望能改变这一点。
+
+起初，Rust 团队认为确保内存安全和防止并发问题是两个分别需要不同方法应对的挑战。随着时间的推移，团队发现所有权和类型系统是一系列解决内存安全 和 并发问题的强有力的工具！通过利用所有权和类型检查，在 Rust 中很多并发错误都是 编译时 错误，而非运行时错误。因此，相比花费大量时间尝试重现运行时并发 bug 出现的特定情况，Rust 会拒绝编译不正确的代码并提供解释问题的错误信息。因此，可以在开发时修复代码，而不是在部署到生产环境后修复代码。给 Rust 的这一部分起了一个绰号 无畏并发（fearless concurrency）。无畏并发令的代码免于出现诡异的 bug 并可以轻松重构且无需担心会引入新的 bug。
+
+*注意：注意：出于简洁的考虑，将很多问题归类为 并发，而不是更准确的区分 并发和（或）并行。如果这是一本专注于并发和/或并行的书，肯定会更加精确的。对于本章，当谈到 并发 时，请自行脑内替换为 并发和（或）并行。*
+
+很多语言所提供的处理并发问题的解决方法都非常有特色。例如，Erlang 有着优雅的消息传递并发功能，但只有模糊不清的在线程间共享状态的方法。对于高级语言来说，只实现可能解决方案的子集是一个合理的策略，因为高级语言所许诺的价值来源于牺牲一些控制来换取抽象。然而对于底层语言则期望提供在任何给定的情况下有着最高的性能且对硬件有更少的抽象。因此，Rust 提供了多种工具，以符合实际情况和需求的方式来为问题建模。
+
+如下是本章将要涉及到的内容：
+
+* 如何创建线程来同时运行多段代码。
+* 消息传递（Message passing）并发，其中通道（channel）被用来在线程间传递消息。
+* 共享状态（Shared state）并发，其中多个线程可以访问同一片数据。
+* Sync 和 Send trait，他们允许 Rust 的并发保证能被扩展到用户定义的和标准库中提供的类型中。
+
+#### 使用线程同时运行代码
+
+在大部分现代操作系统中，执行中程序的代码运行于一个 进程（process）中，操作系统则负责管理多个进程。在程序内部，也可以拥有多个同时运行的独立部分。这个运行这些独立部分的功能被称为 线程（threads）。
+
+将程序中的计算拆分进多个线程可以改善性能，因为程序可以同时进行多个任务，不过这也会增加复杂性。因为线程是同时运行的，所以无法预先保证不同线程中的代码的执行顺序。这会导致诸如此类的问题：
+
+* 竞争状态（Race conditions），多个线程以不一致的顺序访问数据或资源
+* 死锁（Deadlocks），两个线程相互等待对方停止使用其所拥有的资源，这会阻止它们继续运行
+* 只会发生在特定情况且难以稳定重现和修复的 bug
+
+Rust 尝试缓和使用线程的负面影响。不过在多线程上下文中编程仍需格外小心，同时其所要求的代码结构也不同于运行于单线程的程序。
+
+编程语言有一些不同的方法来实现线程。很多操作系统提供了创建新线程的 API。这种由编程语言调用操作系统 API 创建线程的模型有时被称为 1:1，一个 OS 线程对应一个语言线程。
+
+很多编程语言提供了自己特殊的线程实现。编程语言提供的线程被称为 绿色（green）线程，使用绿色线程的语言会在不同数量的 OS 线程的上下文中执行它们。为此，绿色线程模式被称为 M:N 模型：M 个绿色线程对应 N 个 OS 线程，这里 M 和 N 不必相同。
+
+每一个模型都有其优势和取舍。对于 Rust 来说最重要的取舍是运行时支持。运行时（Runtime）是一个令人迷惑的概念，其在不同上下文中可能有不同的含义。
+
+在当前上下文中，运行时 代表二进制文件中包含的由语言自身提供的代码。这些代码根据语言的不同可大可小，不过任何非汇编语言都会有一定数量的运行时代码。为此，通常人们说一个语言 “没有运行时”，一般意味着 “小运行时”。更小的运行时拥有更少的功能不过其优势在于更小的二进制输出，这使其易于在更多上下文中与其他语言相结合。虽然很多语言觉得增加运行时来换取更多功能没有什么问题，但是 Rust 需要做到几乎没有运行时，同时为了保持高性能必需能够调用 C 语言，这点也是不能妥协的。
+
+绿色线程的 M:N 模型需要更大的语言运行时来管理这些线程。因此，Rust 标准库只提供了 1:1 线程模型实现。由于 Rust 是较为底层的语言，如果愿意牺牲性能来换取的抽象，以获得对线程运行更精细的控制及更低的上下文切换成本，可以使用实现了 M:N 线程模型的 crate。
+
+#### 使用 spawn 创建新线程
+
+需要调用 thread::spawn 函数并传递一个闭包，并在其中包含希望在新线程运行的代码。
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {} from the spawned thread!", i);
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    for i in 1..5 {
+        println!("hi number {} from the main thread!", i);
+        thread::sleep(Duration::from_millis(1));
+    }
+}
+
+```
+
+注意这个函数编写的方式，当主线程结束时，新线程也会结束，而不管其是否执行完毕。
+
+thread::sleep 调用强制线程停止执行一小段时间，这会允许其他不同的线程运行。这些线程可能会轮流运行，不过并不保证如此：这依赖操作系统如何调度线程。在这里，主线程首先打印，即便新创建线程的打印语句位于程序的开头，甚至即便告诉新建的线程打印直到 i 等于 9 ，它在主线程结束之前也只打印到了 5。
+
+如果运行代码只看到了主线程的输出，或没有出现重叠打印的现象，尝试增加 range 的数值来增加操作系统切换线程的机会。
+
+#### 使用 join 等待所有线程结束
+
+可以通过将 thread::spawn 的返回值储存在变量中来修复新建线程部分没有执行或者完全没有执行的问题。thread::spawn 的返回值类型是 JoinHandle。JoinHandle 是一个拥有所有权的值，当对其调用 join 方法时，它会等待其线程结束。
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let handle = thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {} from the spawned thread!", i);
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    for i in 1..5 {
+        println!("hi number {} from the main thread!", i);
+        thread::sleep(Duration::from_millis(1));
+    }
+
+    handle.join().unwrap();
+}
+
+```
+
+通过调用 handle 的 join 会阻塞当前线程直到 handle 所代表的线程结束。阻塞（Blocking） 线程意味着阻止该线程执行工作或退出。因为将 join 调用放在了主线程的 for 循环之后.
+
+这两个线程仍然会交替执行，不过主线程会由于 handle.join() 调用会等待直到新建线程执行完毕。
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let handle = thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {} from the spawned thread!", i);
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    handle.join().unwrap();
+
+    for i in 1..5 {
+        println!("hi number {} from the main thread!", i);
+        thread::sleep(Duration::from_millis(1));
+    }
+}
+
+```
+
+#### 线程与 move 闭包
+
+move 闭包，其经常与 thread::spawn 一起使用，因为它允许在一个线程中使用另一个线程的数据。
+
+通过在闭包之前增加 move 关键字，强制闭包获取其使用的值的所有权，而不是任由 Rust 推断它应该借用值。
+
+```rust
+use std::thread;
+
+fn main() {
+    let v = vec![1, 2, 3];
+
+    let handle = thread::spawn(move || {
+        println!("Here's a vector: {:?}", v);
+    });
+
+    handle.join().unwrap();
+}
+
+```
+
+#### 使用消息传递在线程间传送数据
+
+一个日益流行的确保安全并发的方式是 消息传递（message passing），这里线程或 actor 通过发送包含数据的消息来相互沟通。这个思想来源于 Go 编程语言文档中 的口号：“不要共享内存来通讯；而是要通讯来共享内存。”（“Do not communicate by sharing memory; instead, share memory by communicating.”）
+
+编程中的通道有两部分组成，一个发送者（transmitter）和一个接收者（receiver）。发送者一端位于上游位置，在这里可以将橡皮鸭放入河中，接收者部分则位于下游，橡皮鸭最终会漂流至此。代码中的一部分调用发送者的方法以及希望发送的数据，另一部分则检查接收端收到到达的消息。当发送者或接收者任一被丢弃时可以认为通道被 关闭（closed）了
+
+这里，将开发一个程序，它会在一个线程生成值向通道发送，而在另一个线程会接收值并打印出来。这里会通过通道在线程间发送简单值来演示这个功能。一旦熟悉了这项技术，就能使用通道来实现聊天系统或利用很多线程进行分布式计算并将部分计算结果发送给一个线程进行聚合。
+
+```rust
+use std::sync::mpsc;
+
+fn main() {
+    let (tx, rx) = mpsc::channel();
+}
+
+```
+
+这里使用 mpsc::channel 函数创建一个新的通道；mpsc 是 多个生产者，单个消费者（multiple producer, single consumer）的缩写。简而言之，Rust 标准库实现通道的方式意味着一个通道可以有多个产生值的 发送（sending）端，但只能有一个消费这些值的 接收（receiving）端。想象一下多条小河小溪最终汇聚成大河：所有通过这些小河发出的东西最后都会来到大河的下游。目前以单个生产者开始，但是当示例可以工作后会增加多个生产者。
+
+mpsc::channel 函数返回一个元组：第一个元素是发送端，而第二个元素是接收端。由于历史原因，tx 和 rx 通常作为 发送者（transmitter）和 接收者（receiver）的缩写，所以这就是将用来绑定这两端变量的名字。这里使用了一个 let 语句和模式来解构了此元组；如此使用 let 语句是一个方便提取 mpsc::channel 返回的元组中一部分的手段。
+
+将发送端移动到一个新建线程中并发送一个字符串，这样新建线程就可以和主线程通讯了，
+
+```rust
+use std::thread;
+use std::sync::mpsc;
+
+fn main() {
+    let (tx, rx) = mpsc::channel();
+
+    thread::spawn(move || {
+        let val = String::from("hi");
+        tx.send(val).unwrap();
+    });
+}
+
+```
+
+通道的接收端有两个有用的方法：recv 和 try_recv。这里，使用了 recv，它是 receive 的缩写。这个方法会阻塞主线程执行直到从通道中接收一个值。一旦发送了一个值，recv 会在一个 Result<T, E> 中返回它。当通道发送端关闭，recv 会返回一个错误表明不会再有新的值到来了。
+
+try_recv 不会阻塞，相反它立刻返回一个 Result<T, E>：Ok 值包含可用的信息，而 Err 值代表此时没有任何消息。如果线程在等待消息过程中还有其他工作时使用 try_recv 很有用：可以编写一个循环来频繁调用 try_recv，再有可用消息时进行处理，其余时候则处理一会其他工作直到再次检查。
+
+##### 通道与所有权转移
+
+所有权规则在消息传递中扮演了重要角色，其有助于编写安全的并发代码。在并发编程中避免错误是在整个 Rust 程序中必须思考所有权所换来的一大优势。现在做一个试验来看看通道与所有权如何一同协作以避免产生问题：将尝试在新建线程中的通道中发送完 val 值 之后 再使用它。
+
+##### 发送多个值并观察接收者的等待
+
+```rust
+use std::thread;
+use std::sync::mpsc;
+use std::time::Duration;
+
+fn main() {
+    let (tx, rx) = mpsc::channel();
+
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("hi"),
+            String::from("from"),
+            String::from("the"),
+            String::from("thread"),
+        ];
+
+        for val in vals {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    for received in rx {
+        println!("Got: {}", received);
+    }
+}
+
+```
+
+在新建线程中有一个字符串 vector 希望发送到主线程。遍历他们，单独的发送每一个字符串并通过一个 Duration 值调用 thread::sleep 函数来暂停一秒。
+
+在主线程中，不再显式调用 recv 函数：而是将 rx 当作一个迭代器。对于每一个接收到的值，将其打印出来。当通道被关闭时，迭代器也将结束。
+
+##### 通过克隆发送者来创建多个生产者
+
+```rust
+use std::thread;
+use std::sync::mpsc;
+use std::time::Duration;
+
+fn main() {
+// --snip--
+
+let (tx, rx) = mpsc::channel();
+
+let tx1 = mpsc::Sender::clone(&tx);
+thread::spawn(move || {
+    let vals = vec![
+        String::from("hi"),
+        String::from("from"),
+        String::from("the"),
+        String::from("thread"),
+    ];
+
+    for val in vals {
+        tx1.send(val).unwrap();
+        thread::sleep(Duration::from_secs(1));
+    }
+});
+
+thread::spawn(move || {
+    let vals = vec![
+        String::from("more"),
+        String::from("messages"),
+        String::from("for"),
+        String::from("you"),
+    ];
+
+    for val in vals {
+        tx.send(val).unwrap();
+        thread::sleep(Duration::from_secs(1));
+    }
+});
+
+for received in rx {
+    println!("Got: {}", received);
+}
+
+// --snip--
+}
+
+```
+
+这一次，在创建新线程之前，对通道的发送端调用了 clone 方法。这会给一个可以传递给第一个新建线程的发送端句柄。会将原始的通道发送端传递给第二个新建线程。这样就会有两个线程，每个线程将向通道的接收端发送不同的消息。
+
+#### 共享状态并发
+
+在某种程度上，任何编程语言中的通道都类似于单所有权，因为一旦将一个值传送到通道中，将无法再使用这个值。共享内存类似于多所有权：多个线程可以同时访问相同的内存位置。
+
+#### 互斥器一次只允许一个线程访问数据
+
+互斥器（mutex）是 mutual exclusion 的缩写，也就是说，任意时刻，其只允许一个线程访问某些数据。为了访问互斥器中的数据，线程首先需要通过获取互斥器的 锁（lock）来表明其希望访问数据。锁是一个作为互斥器一部分的数据结构，它记录谁有数据的排他访问权。因此，描述互斥器为通过锁系统 保护（guarding）其数据。
+
+mutex的缺点：
+
+* 在使用数据之前尝试获取锁。
+* 处理完被互斥器所保护的数据之后，必须解锁数据，这样其他线程才能够获取锁。
+
+##### `Mutex<T>`的 API 
+
+```rust
+use std::sync::Mutex;
+
+fn main() {
+    let m = Mutex::new(5);
+
+    {
+        let mut num = m.lock().unwrap();
+        *num = 6;
+    }
+
+    println!("m = {:?}", m);
+}
+
+```
+
+像很多类型一样，使用关联函数 new 来创建一个 `Mutex<T>`。使用 lock 方法获取锁，以访问互斥器中的数据。这个调用会阻塞当前线程，直到拥有锁为止。
+
+如果另一个线程拥有锁，并且那个线程 panic 了，则 lock 调用会失败。在这种情况下，没人能够再获取锁，所以这里选择 unwrap 并在遇到这种情况时使线程 panic。
+
+一旦获取了锁，就可以将返回值（在这里是num）视为一个其内部数据的可变引用了。类型系统确保了在使用 m 中的值之前获取锁：`Mutex<i32>` 并不是一个 i32，所以 必须 获取锁才能使用这个 i32 值。是不会忘记这么做的，因为反之类型系统不允许访问内部的 i32 值。
+
+正如所怀疑的，`Mutex<T>` 是一个智能指针。更准确的说，lock 调用 返回 一个叫做 MutexGuard 的智能指针。这个智能指针实现了 Deref 来指向其内部数据；其也提供了一个 Drop 实现当 MutexGuard 离开作用域时自动释放锁，
+
+##### 多线程和多所有权
+
+通过使用智能指针 `Rc<T>` 来创建引用计数的值，以便拥有多所有者。将例子中的 `Mutex<T>` 封装进 `Rc<T>` 中并在将所有权移入线程之前克隆了 `Rc<T>`。现在理解了所发生的错误，同时也将代码改回使用 for 循环，并保留闭包的 move 关键字：
+
+```rust
+use std::rc::Rc;
+use std::sync::Mutex;
+use std::thread;
+
+fn main() {
+    let counter = Rc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Rc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+
+```
+
+再一次编译并出现了不同的错误！
+
+```rust
+error[E0277]: `std::rc::Rc<std::sync::Mutex<i32>>` cannot be sent between threads safely
+  --> src/main.rs:11:22
+   |
+11 |         let handle = thread::spawn(move || {
+   |                      ^^^^^^^^^^^^^ `std::rc::Rc<std::sync::Mutex<i32>>`
+cannot be sent between threads safely
+   |
+   = help: within `[closure@src/main.rs:11:36: 14:10
+counter:std::rc::Rc<std::sync::Mutex<i32>>]`, the trait `std::marker::Send`
+is not implemented for `std::rc::Rc<std::sync::Mutex<i32>>`
+   = note: required because it appears within the type
+`[closure@src/main.rs:11:36: 14:10 counter:std::rc::Rc<std::sync::Mutex<i32>>]`
+   = note: required by `std::thread::spawn`
+
+```
+
+不幸的是，`Rc<T>` 并不能安全的在线程间共享。当 `Rc<T>` 管理引用计数时，它必须在每一个 clone 调用时增加计数，并在每一个克隆被丢弃时减少计数。`Rc<T>` 并没有使用任何并发原语，来确保改变计数的操作不会被其他线程打断。在计数出错时可能会导致诡异的 bug，比如可能会造成内存泄漏，或在使用结束之前就丢弃一个值。所需要的是一个完全类似 `Rc<T>`，又以一种线程安全的方式改变引用计数的类型。
+
+##### 原子引用计数 Arc<T>
+
+所幸 `Arc<T>` 正是 这么一个类似 `Rc<T>` 并可以安全的用于并发环境的类型。字母 “a” 代表 原子性（atomic），所以这是一个原子引用计数（atomically reference counted）类型。原子性是另一类这里还未涉及到的并发原语：请查看标准库中 std::sync::atomic 的文档来获取更多细节。其中的要点就是：原子性类型工作起来类似原始类型，不过可以安全的在线程间共享。
+
+为什么不是所有标准库中的类型都默认使用 `Arc<T>` 实现？原因在于线程安全带有性能损失。
+
+```rust
+use std::sync::{Mutex, Arc};
+use std::thread;
+
+fn main() {
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+
+```
+
+##### `RefCell<T>`/`Rc<T>` 与 `Mutex<T>`/`Arc<T>` 的相似性
+
+因为 counter 是不可变的，不过可以获取其内部值的可变引用；这意味着 `Mutex<T>` 提供了内部可变性，就像 Cell 系列类型那样。正如中使用 `RefCell<T>` 可以改变 `Rc<T>` 中的内容那样，同样的可以使用 `Mutex<T>` 来改变 `Arc<T>` 中的内容。
+
+另一个值得注意的细节是 Rust 不能避免使用 `Mutex<T>` 的全部逻辑错误。回忆一下使用 `Rc<T>` 就有造成引用循环的风险，这时两个 `Rc<T>` 值相互引用，造成内存泄露。同理，`Mutex<T>` 也有造成 死锁（deadlock） 的风险。这发生于当一个操作需要锁住两个资源而两个线程各持一个锁，这会造成它们永远相互等待。如果对这个主题感兴趣，尝试编写一个带有死锁的 Rust 程序，接着研究任何其他语言中使用互斥器的死锁规避策略并尝试在 Rust 中实现他们。标准库中 `Mutex<T>`和 `MutexGuard` 的 API 文档会提供有用的信息。
+
+#### 使用 Sync 和 Send trait 的可扩展并发
+
+Rust 的并发模型中一个有趣的方面是：语言本身对并发知之 甚少。之前讨论的几乎所有内容，都属于标准库，而不是语言本身的内容。由于不需要语言提供并发相关的基础设施，并发方案不受标准库或语言所限：可以编写自己的或使用别人编写的并发功能。
+
+然而有两个并发概念是内嵌于语言中的：std::marker 中的 Sync 和 Send trait。
+
+##### 通过 Send 允许在线程间转移所有权
+
+Send 标记 trait 表明类型的所有权可以在线程间传递。几乎所有的 Rust 类型都是Send 的，不过有一些例外，包括 `Rc<T>`：这是不能 Send 的，因为如果克隆了 `Rc<T>` 的值并尝试将克隆的所有权转移到另一个线程，这两个线程都可能同时更新引用计数。为此，`Rc<T>` 被实现为用于单线程场景，这时不需要为拥有线程安全的引用计数而付出性能代价。
+
+因此，Rust 类型系统和 trait bound 确保永远也不会意外的将不安全的 `Rc<T>` 在线程间发送。当尝试在示例 16-14 中这么做的时候，会得到错误 `the trait Send is not implemented for Rc<Mutex<i32>>`。而使用标记为 `Send` 的 `Arc<T>` 时，就没有问题了。
+
+任何完全由 `Send` 的类型组成的类型也会自动被标记为 `Send`。几乎所有基本类型都是 `Send` 的，
+
+#### Sync 允许多线程访问
+
+Sync 标记 trait 表明一个实现了 Sync 的类型可以安全的在多个线程中拥有其值的引用。换一种方式来说，对于任意类型 T，如果 &T（T 的引用）是 Send 的话 T 就是 Sync 的，这意味着其引用就可以安全的发送到另一个线程。类似于 Send 的情况，基本类型是 Sync 的，完全由 Sync 的类型组成的类型也是 Sync 的。
+
+通常并不需要手动实现 Send 和 Sync trait，因为由 Send 和 Sync 的类型组成的类型，自动就是 Send 和 Sync 的。因为他们是标记 trait，甚至都不需要实现任何方法。他们只是用来加强并发相关的不可变性的。
+
+### Rust 的面向对象特性
+
+Rust 被很多不同的编程范式影响，包括面向对象编程；函数式编程的特性。
+
+#### 对象包含数据和行为
+
+面向对象的程序是由对象组成的。一个 对象 包含数据和操作这些数据的过程。这些过程通常被称为 方法 或 操作。
+
+Rust 是面向对象的：结构体和枚举包含数据而 impl 块提供了在结构体和枚举之上的方法。虽然带有方法的结构体和枚举并不被 称为 对象，但是他们提供了与对象相同的功能，
+
+#### 封装隐藏了实现细节
+
+另一个通常与面向对象编程相关的方面是 封装（encapsulation）的思想：对象的实现细节不能被使用对象的代码获取到。所以唯一与对象交互的方式是通过对象提供的公有 API；使用对象的代码无法深入到对象内部并直接改变数据或者行为。封装使得改变和重构对象的内部时无需改变使用对象的代码。
+
+Rust可以使用 pub 关键字来决定模块、类型、函数和方法是公有的，而默认情况下其他一切都是私有的。
+
+比如，可以定义一个包含一个 i32 类型 vector 的结构体 AveragedCollection。结构体也可以有一个字段，该字段保存了 vector 中所有值的平均值。这样，希望知道结构体中的 vector 的平均值的人可以随时获取它，而无需自己计算。换句话说，AveragedCollection 会为缓存平均值结果。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct AveragedCollection {
+    list: Vec<i32>,
+    average: f64,
+}
+}
+```
+
+注意，结构体自身被标记为 pub，这样其他代码就可以使用这个结构体，但是在结构体内部的字段仍然是私有的。这是非常重要的，因为希望保证变量被增加到列表或者被从列表删除时，也会同时更新平均值。可以通过在结构体上实现 add、remove 和 average 方法来做到这一点，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct AveragedCollection {
+    list: Vec<i32>,
+    average: f64,
+}
+impl AveragedCollection {
+    pub fn add(&mut self, value: i32) {
+        self.list.push(value);
+        self.update_average();
+    }
+
+    pub fn remove(&mut self) -> Option<i32> {
+        let result = self.list.pop();
+        match result {
+            Some(value) => {
+                self.update_average();
+                Some(value)
+            },
+            None => None,
+        }
+    }
+
+    pub fn average(&self) -> f64 {
+        self.average
+    }
+
+    fn update_average(&mut self) {
+        let total: i32 = self.list.iter().sum();
+        self.average = total as f64 / self.list.len() as f64;
+    }
+}
+}
+```
+公有方法 add、remove 和 average 是修改 AveragedCollection 实例的唯一方式。当使用 add 方法把一个元素加入到 list 或者使用 remove 方法来删除时，这些方法的实现同时会调用私有的 update_average 方法来更新 average 字段。
+
+list 和 average 是私有的，所以没有其他方式来使得外部的代码直接向 list 增加或者删除元素，否则 list 改变时可能会导致 average 字段不同步。average 方法返回 average 字段的值，这使得外部的代码只能读取 average 而不能修改它。
+
+因为已经封装好了 AveragedCollection 的实现细节，将来可以轻松改变类似数据结构这些方面的内容。例如，可以使用 `HashSet<i32>` 代替 `Vec<i32>` 作为 list 字段的类型。只要 add、remove 和 average 公有函数的签名保持不变，使用 AveragedCollection 的代码就无需改变。相反如果使得 list 为公有，就未必都会如此了： `HashSet<i32>` 和 `Vec<i32>` 使用不同的方法增加或移除项，所以如果要想直接修改 list 的话，外部的代码可能不得不做出修改。
+
+如果封装是一个语言被认为是面向对象语言所必要的方面的话，那么 Rust 满足这个要求。在代码中不同的部分使用 pub 与否可以封装其实现细节。
+
+#### 继承，作为类型系统与代码共享
+
+继承（Inheritance）是一个很多编程语言都提供的机制，一个对象可以定义为继承另一个对象的定义，这使其可以获得父对象的数据和行为，而无需重新定义。
+
+如果一个语言必须有继承才能被称为面向对象语言的话，那么 Rust 就不是面向对象的。无法定义一个结构体继承父结构体的成员和方法。然而，如果过去常常在的编程工具箱使用继承，根据最初考虑继承的原因，Rust 也提供了其他的解决方案。
+
+选择继承有两个主要的原因。第一个是为了重用代码：一旦为一个类型实现了特定行为，继承可以对一个不同的类型重用这个实现。相反 Rust 代码可以使用默认 trait 方法实现来进行共享，在之前的例子中见过在 Summary trait 上增加的 summarize 方法的默认实现。任何实现了 Summary trait 的类型都可以使用 summarize 方法而无须进一步实现。这类似于父类有一个方法的实现，而通过继承子类也拥有这个方法的实现。当实现 Summary trait 时也可以选择覆盖 summarize 的默认实现，这类似于子类覆盖从父类继承的方法实现。
+
+第二个使用继承的原因与类型系统有关：表现为子类型可以用于父类型被使用的地方。这也被称为 多态（polymorphism），这意味着如果多种对象共享特定的属性，则可以相互替代使用。
+
+很多人将多态描述为继承的同义词。不过它是一个有关可以用于多种类型的代码的更广泛的概念。对于继承来说，这些类型通常是子类。 Rust 则通过泛型来对不同的可能类型进行抽象，并通过 trait bounds 对这些类型所必须提供的内容施加约束。这有时被称为 bounded parametric polymorphism。
+
+近来继承作为一种语言设计的解决方案在很多语言中失宠了，因为其时常带有共享多于所需的代码的风险。子类不应总是共享其父类的所有特征，但是继承却始终如此。如此会使程序设计更为不灵活，并引入无意义的子类方法调用，或由于方法实际并不适用于子类而造成错误的可能性。某些语言还只允许子类继承一个父类，进一步限制了程序设计的灵活性。
+
+因为这些原因，Rust 选择了一个不同的途径，使用 trait 对象而不是继承。看一下 Rust 中的 trait 对象是如何实现多态的。
+
+#### 为使用不同类型的值而设计的 trait 对象
+
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub trait Draw {
+    fn draw(&self);
+}
+
+pub struct Screen {
+    pub components: Vec<Box<dyn Draw>>,
+}
+
+impl Screen {
+    pub fn run(&self) {
+        for component in self.components.iter() {
+            component.draw();
+        }
+    }
+}
+}
+```
+
+这与定义使用了带有 trait bound 的泛型类型参数的结构体不同。泛型类型参数一次只能替代一个具体类型，而 trait 对象则允许在运行时替代多种具体类型。例如，可以定义 Screen 结构体来使用泛型和 trait bound，如下例所示：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub trait Draw {
+    fn draw(&self);
+}
+
+pub struct Screen<T: Draw> {
+    pub components: Vec<T>,
+}
+
+impl<T> Screen<T>
+    where T: Draw {
+    pub fn run(&self) {
+        for component in self.components.iter() {
+            component.draw();
+        }
+    }
+}
+}
+```
+
+这限制了 Screen 实例必须拥有一个全是 Button 类型或者全是 TextField 类型的组件列表。如果只需要同质（相同类型）集合，则倾向于使用泛型和 trait bound，因为其定义会在编译时采用具体类型进行单态化。
+
+另一方面，通过使用 trait 对象的方法，一个 Screen 实例可以存放一个既能包含 `Box<Button>`，也能包含 `Box<TextField>` 的 `Vec<T>`。看看它是如何工作的，接着会讲到其运行时性能影响。
+
+#### 实现 trait
+
+现在来增加一些实现了 Draw trait 的类型。将提供 Button 类型。再一次重申，真正实现 GUI 库超出了本书的范畴，所以 draw 方法体中不会有任何有意义的实现。为了想象一下这个实现看起来像什么，一个 Button 结构体可能会拥有 width、height 和 label 字段，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub trait Draw {
+    fn draw(&self);
+}
+
+pub struct Button {
+    pub width: u32,
+    pub height: u32,
+    pub label: String,
+}
+
+impl Draw for Button {
+    fn draw(&self) {
+        // 实际绘制按钮的代码
+    }
+}
+}
+```
+
+在 Button 上的 width、height 和 label 字段会和其他组件不同，比如 TextField 可能有 width、height、label 以及 placeholder 字段。每一个希望能在屏幕上绘制的类型都会使用不同的代码来实现 Draw trait 的 draw 方法来定义如何绘制特定的类型，像这里的 Button 类型（并不包含任何实际的 GUI 代码，这超出了本章的范畴）。除了实现 Draw trait 之外，比如 Button 还可能有另一个包含按钮点击如何响应的方法的 impl 块。这类方法并不适用于像 TextField 这样的类型。
+
+如果一些库的使用者决定实现一个包含 width、height 和 options 字段的结构体 SelectBox，并且也为其实现了 Draw trait，如下例所示：
+
+```rust
+use gui::Draw;
+
+struct SelectBox {
+    width: u32,
+    height: u32,
+    options: Vec<String>,
+}
+
+impl Draw for SelectBox {
+    fn draw(&self) {
+        // code to actually draw a select box
+    }
+}
+
+```
+
+库使用者现在可以在他们的 main 函数中创建一个 Screen 实例。至此可以通过将 SelectBox 和 Button 放入 `Box<T>` 转变为 trait 对象来增加组件。接着可以调用 Screen 的 run 方法，它会调用每个组件的 draw 方法。如下所示:
+
+```rust
+use gui::{Screen, Button};
+
+fn main() {
+    let screen = Screen {
+        components: vec![
+            Box::new(SelectBox {
+                width: 75,
+                height: 10,
+                options: vec![
+                    String::from("Yes"),
+                    String::from("Maybe"),
+                    String::from("No")
+                ],
+            }),
+            Box::new(Button {
+                width: 50,
+                height: 10,
+                label: String::from("OK"),
+            }),
+        ],
+    };
+
+    screen.run();
+}
+
+```
+
+当编写库的时候，不知道何人会在何时增加 SelectBox 类型，不过 Screen 的实现能够操作并绘制这个新类型，因为 SelectBox 实现了 Draw trait，这意味着它实现了 draw 方法。
+
+这个概念 —— 只关心值所反映的信息而不是其具体类型 —— 类似于动态类型语言中称为 鸭子类型（duck typing）的概念：如果它走起来像一只鸭子，叫起来像一只鸭子，那么它就是一只鸭子！在示例 17-5 中 Screen 上的 run 实现中，run 并不需要知道各个组件的具体类型是什么。它并不检查组件是 Button 或者 SelectBox 的实例。通过指定 `Box<dyn Draw>` 作为 components vector 中值的类型，就定义了 Screen 为需要可以在其上调用 draw 方法的值。
+
+使用 trait 对象和 Rust 类型系统来进行类似鸭子类型操作的优势是无需在运行时检查一个值是否实现了特定方法或者担心在调用时因为值没有实现方法而产生错误。如果值没有实现 trait 对象所需的 trait 则 Rust 不会编译这些代码。
+
+#### trait 对象执行动态分发
+
+当对泛型使用 trait bound 时编译器所进行单态化处理：编译器为每一个被泛型类型参数代替的具体类型生成了非泛型的函数和方法实现。单态化所产生的代码进行 静态分发（static dispatch）。静态分发发生于编译器在编译时就知晓调用了什么方法的时候。这与 动态分发 （dynamic dispatch）相对，这时编译器在编译时无法知晓调用了什么方法。在动态分发的情况下，编译器会生成在运行时确定调用了什么方法的代码。
+
+当使用 trait 对象时，Rust 必须使用动态分发。编译器无法知晓所有可能用于 trait 对象代码的类型，所以它也不知道应该调用哪个类型的哪个方法实现。为此，Rust 在运行时使用 trait 对象中的指针来知晓需要调用哪个方法。动态分发也阻止编译器有选择的内联方法代码，这会相应的禁用一些优化。
+
+#### Trait 对象要求对象安全
+
+只有 对象安全（object safe）的 trait 才可以组成 trait 对象。围绕所有使得 trait 对象安全的属性存在一些复杂的规则，不过在实践中，只涉及到两条规则。如果一个 trait 中所有的方法有如下属性时，则该 trait 是对象安全的：
+
+* 返回值类型不为 Self
+* 方法没有任何泛型类型参数
+* 
+Self 关键字是要实现 trait 或方法的类型的别名。对象安全对于 trait 对象是必须的，因为一旦有了 trait 对象，就不再知晓实现该 trait 的具体类型是什么了。如果 trait 方法返回具体的 Self 类型，但是 trait 对象忘记了其真正的类型，那么方法不可能使用已经忘却的原始具体类型。同理对于泛型类型参数来说，当使用 trait 时其会放入具体的类型参数：此具体类型变成了实现该 trait 的类型的一部分。当使用 trait 对象时其具体类型被抹去了，故无从得知放入泛型参数类型的类型是什么。
+
+一个 trait 的方法不是对象安全的例子是标准库中的 Clone trait。Clone trait 的 clone 方法的参数签名看起来像这样：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub trait Clone {
+    fn clone(&self) -> Self;
+}
+}
+```
+
+String 实现了 Clone trait，当在 String 实例上调用 clone 方法时会得到一个 String 实例。类似的，当调用 `Vec<T>` 实例的 clone 方法会得到一个 `Vec<T>` 实例。clone 的签名需要知道什么类型会代替 Self，因为这是它的返回值。
+
+如果尝试做一些违反有关 trait 对象的对象安全规则的事情，编译器会产生提示。如
+
+```rust
+pub struct Screen {
+    pub components: Vec<Box<dyn Clone>>,
+}
+
+```
+
+将会得到如下错误：
+
+```rust
+error[E0038]: the trait `std::clone::Clone` cannot be made into an object
+ --> src/lib.rs:2:5
+  |
+2 |     pub components: Vec<Box<dyn Clone>>,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `std::clone::Clone`
+  cannot be made into an object
+  |
+  = note: the trait cannot require that `Self : Sized`
+
+```
+
+#### 面向对象设计模式的实现
+
+状态模式（state pattern）是一个面向对象设计模式。该模式的关键在于一个值有某些内部状态，体现为一系列的 状态对象，同时值的行为随着其内部状态而改变。状态对象共享功能：当然，在 Rust 中使用结构体和 trait 而不是对象和继承。每一个状态对象代表负责其自身的行为和当需要改变为另一个状态时的规则的状态。持有任何一个这种状态对象的值对于不同状态的行为以及何时状态转移毫不知情。
+
+使用状态模式意味着当程序的业务需求改变时，无需改变值持有状态或者使用值的代码。只需更新某个状态对象中的代码来改变其规则，或者是增加更多的状态对象。
+
+为了探索这个概念，将实现一个增量式的发布博文的工作流。这个博客的最终功能看起来像这样：
+
+1. 博文从空白的草案开始。
+2. 一旦草案完成，请求审核博文。
+3. 一旦博文过审，它将被发表。
+4. 只有被发表的博文的内容会被打印，这样就不会意外打印出没有被审核的博文的文本。
+5. 
+任何其他对博文的修改尝试都是没有作用的。例如，如果尝试在请求审核之前通过一个草案博文，博文应该保持未发布的状态。
+
+```rust
+use blog::Post;
+
+fn main() {
+    let mut post = Post::new();
+
+    post.add_text("I ate a salad for lunch today");
+    assert_eq!("", post.content());
+
+    post.request_review();
+    assert_eq!("", post.content());
+
+    post.approve();
+    assert_eq!("I ate a salad for lunch today", post.content());
+}
+
+```
+
+希望允许用户使用 Post::new 创建一个新的博文草案。接着希望能在草案阶段为博文编写一些文本。如果尝试在审核之前立即打印出博文的内容，什么也不会发生因为博文仍然是草案。这里增加的 assert_eq! 出于演示目的。一个好的单元测试将是断言草案博文的 content 方法返回空字符串，不过并不准备为这个例子编写单元测试。
+
+接下来，希望能够请求审核博文，而在等待审核的阶段 content 应该仍然返回空字符串。最后当博文审核通过，它应该被发表，这意味着当调用 content 时博文的文本将被返回。
+
+注意与 crate 交互的唯一的类型是 Post。这个类型会使用状态模式并会存放处于三种博文所可能的状态之一的值 —— 草案，等待审核和发布。状态上的改变由 Post 类型内部进行管理。状态依库用户对 Post 实例调用的方法而改变，但是不能直接管理状态变化。这也意味着用户不会在状态上犯错，比如在过审前发布博文。
+
+##### 定义 Post 并新建一个草案状态的实例
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct Post {
+    state: Option<Box<dyn State>>,
+    content: String,
+}
+
+impl Post {
+    pub fn new() -> Post {
+        Post {
+            state: Some(Box::new(Draft {})),
+            content: String::new(),
+        }
+    }
+}
+
+trait State {}
+
+struct Draft {}
+
+impl State for Draft {}
+}
+```
+
+State trait 定义了所有不同状态的博文所共享的行为，同时 Draft、PendingReview 和 Published 状态都会实现 State 状态。现在这个 trait 并没有任何方法，同时开始将只定义 Draft 状态因为这是希望博文的初始状态。
+
+当创建新的 Post 时，将其 state 字段设置为一个存放了 Box 的 Some 值。这个 Box 指向一个 Draft 结构体新实例。这确保了无论何时新建一个 Post 实例，它都会从草案开始。因为 Post 的 state 字段是私有的，也就无法创建任何其他状态的 Post 了！。Post::new 函数中将 content 设置为新建的空 String。
+
+##### 存放博文内容的文本
+
+希望能够调用一个叫做 add_text 的方法并向其传递一个 &str 来将文本增加到博文的内容中。选择实现为一个方法而不是将 content 字段暴露为 pub 。这意味着之后可以实现一个方法来控制 content 字段如何被读取。add_text 方法是非常直观的，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct Post {
+    content: String,
+}
+
+impl Post {
+    // --snip--
+    pub fn add_text(&mut self, text: &str) {
+        self.content.push_str(text);
+    }
+}
+}
+```
+
+add_text 获取一个 self 的可变引用，因为需要改变调用 add_text 的 Post 实例。接着调用 content 中的 String 的 push_str 并传递 text 参数来保存到 content 中。这不是状态模式的一部分，因为它的行为并不依赖博文所处的状态。add_text 方法完全不与 state 状态交互，不过这是希望支持的行为的一部分。
+
+##### 确保博文草案的内容是空的
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct Post {
+    content: String,
+}
+
+impl Post {
+    // --snip--
+    pub fn content(&self) -> &str {
+        ""
+    }
+}
+}
+```
+
+##### 请求审核博文来改变其状态
+
+接下来需要增加请求审核博文的功能，这应当将其状态由 Draft 改为 PendingReview。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct Post {
+    state: Option<Box<dyn State>>,
+    content: String,
+}
+
+impl Post {
+    // --snip--
+    pub fn request_review(&mut self) {
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.request_review())
+        }
+    }
+}
+
+trait State {
+    fn request_review(self: Box<Self>) -> Box<dyn State>;
+}
+
+struct Draft {}
+
+impl State for Draft {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        Box::new(PendingReview {})
+    }
+}
+
+struct PendingReview {}
+
+impl State for PendingReview {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+}
+}
+```
+
+这里为 Post 增加一个获取 self 可变引用的公有方法 request_review。接着在 Post 的当前状态下调用内部的 request_review 方法，并且第二个 request_review 方法会消费当前的状态并返回一个新状态。
+
+这里给 State trait 增加了 request_review 方法；所有实现了这个 trait 的类型现在都需要实现 request_review 方法。注意不同于使用 self、 &self 或者 &mut self 作为方法的第一个参数，这里使用了 self: Box<Self>。这个语法意味着这个方法调用只对这个类型的 Box 有效。这个语法获取了 Box<Self> 的所有权，使老状态无效化以便 Post 的状态值可以将自身转换为新状态。
+
+为了消费老状态，request_review 方法需要获取状态值的所有权。这也就是 Post 的 state 字段中 Option 的来历：调用 take 方法将 state 字段中的 Some 值取出并留下一个 None，因为 Rust 不允许在结构体中存在空的字段。这使得将 state 值移动出 Post 而不是借用它。接着将博文的 state 值设置为这个操作的结果。
+
+这里需要将 state 临时设置为 None，不同于像 self.state = self.state.request_review(); 这样的代码直接设置 state 字段，来获取 state 值的所有权。这确保了当 Post 被转换为新状态后其不再能使用老的 state 值。
+
+Draft 的方法 request_review 的实现返回一个新的，装箱的 PendingReview 结构体的实例，其用来代表博文处于等待审核状态。结构体 PendingReview 同样也实现了 request_review 方法，不过它不进行任何状态转换。相反它返回自身，因为请求审核已经处于 PendingReview 状态的博文应该保持 PendingReview 状态。
+
+现在开始能够看出状态模式的优势了：Post 的 request_review 方法无论 state 是何值都是一样的。每个状态只负责它自己的规则。
+
+将继续保持 Post 的 content 方法不变，返回一个空字符串 slice。现在可以拥有 PendingReview 状态而不仅仅是 Draft 状态的 Post 了，不过希望在 PendingReview 状态下其也有相同的行为。
+
+##### 增加改变 content 行为的 approve 方法
+
+approve 方法将与 request_review 方法类似：它会将 state 设置为审核通过时应处于的状态
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct Post {
+    state: Option<Box<dyn State>>,
+    content: String,
+}
+
+impl Post {
+    // --snip--
+    pub fn approve(&mut self) {
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.approve())
+        }
+    }
+}
+
+trait State {
+    fn request_review(self: Box<Self>) -> Box<dyn State>;
+    fn approve(self: Box<Self>) -> Box<dyn State>;
+}
+
+struct Draft {}
+
+impl State for Draft {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        Box::new(PendingReview {})
+    }
+
+    // --snip--
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+}
+
+struct PendingReview {}
+
+impl State for PendingReview {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+
+    // --snip--
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        Box::new(Published {})
+    }
+}
+
+struct Published {}
+
+impl State for Published {
+    fn request_review(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+
+    fn approve(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+}
+}
+```
+
+这里为 State trait 增加了 approve 方法，并新增了一个实现了 State 的结构体，Published 状态。
+
+类似于 request_review，如果对 Draft 调用 approve 方法，并没有任何效果，因为它会返回 self。当对 PendingReview 调用 approve 时，它返回一个新的、装箱的 Published 结构体的实例。Published 结构体实现了 State trait，同时对于 request_review 和 approve 两方法来说，它返回自身，因为在这两种情况博文应该保持 Published 状态。
+
+现在更新 Post 的 content 方法：如果状态为 Published 希望返回博文 content 字段的值；否则希望返回空字符串 slice，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+trait State {
+    fn content<'a>(&self, post: &'a Post) -> &'a str;
+}
+pub struct Post {
+    state: Option<Box<dyn State>>,
+    content: String,
+}
+
+impl Post {
+    // --snip--
+    pub fn content(&self) -> &str {
+        self.state.as_ref().unwrap().content(self)
+    }
+    // --snip--
+}
+}
+```
+
+因为目标是将所有像这样的规则保持在实现了 State 的结构体中，将调用 state 中的值的 content 方法并传递博文实例（也就是 self）作为参数。接着返回 state 值的 content 方法的返回值。
+
+这里调用 Option 的 as_ref 方法是因为需要 Option 中值的引用而不是获取其所有权。因为 state 是一个 `Option<Box<State>>`，调用 as_ref 会返回一个 `Option<&Box<State>>`。如果不调用 as_ref，将会得到一个错误，因为不能将 state 移动出借用的 &self 函数参数。
+
+接着调用 unwrap 方法，这里知道它永远也不会 panic，因为 Post 的所有方法都确保在他们返回时 state 会有一个 Some 值。这就是一个第十二章 “当比编译器知道更多的情况” 部分讨论过的知道 None 是不可能的而编译器却不能理解的情况。
+
+接着就有了一个 `&Box<State>`，当调用其 content 时，解引用强制多态会作用于 & 和 Box ，这样最终会调用实现了 State trait 的类型的 content 方法。这意味着需要为 State trait 定义增加 content，这也是放置根据所处状态返回什么内容的逻辑的地方，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct Post {
+    content: String
+}
+trait State {
+    // --snip--
+    fn content<'a>(&self, post: &'a Post) -> &'a str {
+        ""
+    }
+}
+
+// --snip--
+struct Published {}
+
+impl State for Published {
+    // --snip--
+    fn content<'a>(&self, post: &'a Post) -> &'a str {
+        &post.content
+    }
+}
+}
+```
+
+这里增加了一个 content 方法的默认实现来返回一个空字符串 slice。这意味着无需为 Draft 和 PendingReview 结构体实现 content 了。Published 结构体会覆盖 content 方法并会返回 post.content 的值。
+
+注意这个方法需要生命周期注解，如第十章所讨论的。这里获取 post 的引用作为参数，并返回 post 一部分的引用，所以返回的引用的生命周期与 post 参数相关。
+
+##### 状态模式的权衡取舍
+
+展示了 Rust 是能够实现面向对象的状态模式的，以便能根据博文所处的状态来封装不同类型的行为。Post 的方法并不知道这些不同类型的行为。通过这种组织代码的方式，要找到所有已发布博文的不同行为只需查看一处代码：Published 的 State trait 的实现。
+
+如果要创建一个不使用状态模式的替代实现，则可能会在 Post 的方法中，或者甚至于在 main 代码中用到 match 语句，来检查博文状态并在这里改变其行为。这意味着需要查看很多位置来理解处于发布状态的博文的所有逻辑！这在增加更多状态时会变得更糟：每一个 match 语句都会需要另一个分支。
+
+对于状态模式来说，Post 的方法和使用 Post 的位置无需 match 语句，同时增加新状态只涉及到增加一个新 struct 和为其实现 trait 的方法。
+
+这个实现易于扩展增加更多功能。为了体会使用此模式维护代码的简洁性，请尝试如下一些建议：
+
+* 增加 reject 方法将博文的状态从 PendingReview 变回 Draft
+* 在将状态变为 Published 之前需要两次 approve 调用
+* 只允许博文处于 Draft 状态时增加文本内容。提示：让状态对象负责什么可能会修改内容而不负责修改 Post。
+
+状态模式的一个缺点是因为状态实现了状态之间的转换，一些状态会相互联系。如果在 PendingReview 和 Published 之间增加另一个状态，比如 Scheduled，则不得不修改 PendingReview 中的代码来转移到 Scheduled。如果 PendingReview 无需因为新增的状态而改变就更好了，不过这意味着切换到另一种设计模式。
+
+另一个缺点是会发现一些重复的逻辑。为了消除他们，可以尝试为 State trait 中返回 self 的 request_review 和 approve 方法增加默认实现，不过这会违反对象安全性，因为 trait 不知道 self 具体是什么。希望能够将 State 作为一个 trait 对象，所以需要其方法是对象安全的。
+
+另一个重复是 Post 中 request_review 和 approve 这两个类似的实现。他们都委托调用了 state 字段中 Option 值的同一方法，并在结果中为 state 字段设置了新值。如果 Post 中的很多方法都遵循这个模式，可能会考虑定义一个宏来消除重复
+
+完全按照面向对象语言的定义实现这个模式并没有尽可能地利用 Rust 的优势。看看一些代码中可以做出的修改，来将无效的状态和状态转移变为编译时错误。
+
+### 模式用来匹配值的结构
+
+
