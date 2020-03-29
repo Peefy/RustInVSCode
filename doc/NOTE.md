@@ -7172,4 +7172,671 @@ impl State for Published {
 
 ### 模式用来匹配值的结构
 
+模式是 Rust 中特殊的语法，它用来匹配类型中的结构，无论类型是简单还是复杂。结合使用模式和 match 表达式以及其他结构可以提供更多对程序控制流的支配权。模式由如下一些内容组合而成：
+
+* 字面值
+* 解构的数组、枚举、结构体或者元组
+* 变量
+* 通配符
+* 占位符
+
+#### match 分支
+
+一个模式常用的位置是 match 表达式的分支。在形式上 match 表达式由 match 关键字、用于匹配的值和一个或多个分支构成，这些分支包含一个模式和在值匹配分支的模式时运行的表达式：
+
+```rust
+match VALUE {
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+}
+
+```
+
+match 表达式必须是 穷尽（exhaustive）的，意为 match 表达式所有可能的值都必须被考虑到。一个确保覆盖每个可能值的方法是在最后一个分支使用捕获所有的模式：比如，一个匹配任何值的名称永远也不会失败，因此可以覆盖所有匹配剩下的情况。
+
+有一个特定的模式 _ 可以匹配所有情况，不过它从不绑定任何变量。这在例如希望忽略任何未指定值的情况很有用。
+
+#### `if let` 条件表达式
+
+下例 展示了也可以组合并匹配 if let、else if 和 else if let 表达式。这相比 match 表达式一次只能将一个值与模式比较提供了更多灵活性；一系列 if let、else if、else if let 分支并不要求其条件相互关联。
+
+```rust
+fn main() {
+    let favorite_color: Option<&str> = None;
+    let is_tuesday = false;
+    let age: Result<u8, _> = "34".parse();
+
+    if let Some(color) = favorite_color {
+        println!("Using your favorite color, {}, as the background", color);
+    } else if is_tuesday {
+        println!("Tuesday is green day!");
+    } else if let Ok(age) = age {
+        if age > 30 {
+            println!("Using purple as the background color");
+        } else {
+            println!("Using orange as the background color");
+        }
+    } else {
+        println!("Using blue as the background color");
+    }
+}
+
+```
+
+#### while let 条件循环
+
+一个与 if let 结构类似的是 while let 条件循环，它允许只要模式匹配就一直进行 while 循环。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let mut stack = Vec::new();
+
+stack.push(1);
+stack.push(2);
+stack.push(3);
+
+while let Some(top) = stack.pop() {
+    println!("{}", top);
+}
+}
+```
+
+这个例子会打印出 3、2 接着是 1。pop 方法取出 vector 的最后一个元素并返回 Some(value)。如果 vector 是空的，它返回 None。while 循环只要 pop 返回 Some 就会一直运行其块中的代码。一旦其返回 None，while 循环停止。可以使用 while let 来弹出栈中的每一个元素。
+
+#### for 循环
+
+如同第三章所讲的，for 循环是 Rust 中最常见的循环结构，不过还没有讲到的是 for 可以获取一个模式。在 for 循环中，模式是 for 关键字直接跟随的值，正如 for x in y 中的 x。
+
+下例中展示了如何使用 for 循环来解构，或拆开一个元组作为 for 循环的一部分：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let v = vec!['a', 'b', 'c'];
+
+for (index, value) in v.iter().enumerate() {
+    println!("{} is at index {}", value, index);
+}
+}
+```
+
+上例的代码会打印出：
+
+```
+a is at index 0
+b is at index 1
+c is at index 2
+```
+
+这里使用 enumerate 方法适配一个迭代器来产生一个值和其在迭代器中的索引，他们位于一个元组中。第一个 enumerate 调用会产生元组 (0, 'a')。当这个值匹配模式 (index, value)，index 将会是 0 而 value 将会是 'a'，并打印出第一行输出。
+
+#### let的模式匹配
+
+为了更清楚的理解 let 的模式匹配方面的内容，考虑下例 中使用 let 和模式解构一个元组：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let (x, y, z) = (1, 2, 3);
+}
+```
+
+#### 函数参数
+
+函数参数也可以是模式。类似于之前对 let 所做的，可以在函数参数中匹配元组。下例将传递给函数的元组拆分为值：
+
+```rust
+fn print_coordinates(&(x, y): &(i32, i32)) {
+    println!("Current location: ({}, {})", x, y);
+}
+
+fn main() {
+    let point = (3, 5);
+    print_coordinates(&point);
+}
+
+```
+
+#### Refutability（可反驳性）: 模式是否会匹配失效
+
+模式有两种形式：refutable（可反驳的）和 irrefutable（不可反驳的）。能匹配任何传递的可能值的模式被称为是 不可反驳的（irrefutable）。一个例子就是 let x = 5; 语句中的 x，因为 x 可以匹配任何值所以不可能会失败。对某些可能的值进行匹配会失败的模式被称为是 可反驳的（refutable）。一个这样的例子便是 if let Some(x) = a_value 表达式中的 Some(x)；如果变量 a_value 中的值是 None 而不是 Some，那么 Some(x) 模式不能匹配。
+
+函数参数、 let 语句和 for 循环只能接受不可反驳的模式，因为通过不匹配的值程序无法进行有意义的工作。if let 和 while let 表达式被限制为只能接受可反驳的模式，因为根据定义他们意在处理可能的失败：条件表达式的功能就是根据成功或失败执行不同的操作。
+
+通常无需担心可反驳和不可反驳模式的区别，不过确实需要熟悉可反驳性的概念，这样当在错误信息中看到时就知道如何应对。遇到这些情况，根据代码行为的意图，需要修改模式或者使用模式的结构。
+
+为了修复在需要不可反驳模式的地方使用可反驳模式的情况，可以修改使用模式的代码：不同于使用 let，可以使用 if let。如此，如果模式不匹配，大括号中的代码将被忽略，其余代码保持有效。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let some_option_value: Option<i32> = None;
+if let Some(x) = some_option_value {
+    println!("{}", x);
+}
+}
+```
+
+匹配分支必须使用可反驳模式，除了最后一个分支需要使用能匹配任何剩余值的不可反驳模式。允许将不可反驳模式用于只有一个分支的 match，不过这么做不是特别有用，并可以被更简单的 let 语句替代。
+
+#### 模式用法：匹配字面值
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let x = 1;
+
+match x {
+    1 => println!("one"),
+    2 => println!("two"),
+    3 => println!("three"),
+    _ => println!("anything"),
+}
+}
+```
+
+#### 模式用法：匹配命名变量
+
+命名变量是匹配任何值的不可反驳模式，这在之前已经使用过数次。然而当其用于 match 表达式时情况会有些复杂。因为 match 会开始一个新作用域，match 表达式中作为模式的一部分声明的变量会覆盖 match 结构之外的同名变量，与所有变量一样。在下例 中，声明了一个值为 Some(5) 的变量 x 和一个值为 10 的变量 y。接着在值 x 上创建了一个 match 表达式。
+
+```rust
+fn main() {
+    let x = Some(5);
+    let y = 10;
+
+    match x {
+        Some(50) => println!("Got 50"),
+        Some(y) => println!("Matched, y = {:?}", y),
+        _ => println!("Default case, x = {:?}", x),
+    }
+
+    println!("at the end: x = {:?}, y = {:?}", x, y);
+}
+
+```
+
+看看当 match 语句运行的时候发生了什么。第一个匹配分支的模式并不匹配 x 中定义的值，所以代码继续执行。
+
+第二个匹配分支中的模式引入了一个新变量 y，它会匹配任何 Some 中的值。因为我们在 match 表达式的新作用域中，这是一个新变量，而不是开头声明为值 10 的那个 y。这个新的 y 绑定会匹配任何 Some 中的值，在这里是 x 中的值。因此这个 y 绑定了 x 中 Some 内部的值。这个值是 5，所以这个分支的表达式将会执行并打印出 Matched, y = 5。
+
+如果 x 的值是 None 而不是 Some(5)，头两个分支的模式不会匹配，所以会匹配下划线。这个分支的模式中没有引入变量 x，所以此时表达式中的 x 会是外部没有被覆盖的 x。在这个假想的例子中，match 将会打印 Default case, x = None。
+
+一旦 match 表达式执行完毕，其作用域也就结束了，同理内部 y 的作用域也结束了。最后的 println! 会打印 at the end: x = Some(5), y = 10。
+
+为了创建能够比较外部 x 和 y 的值，而不引入覆盖变量的 match 表达式，我们需要相应地使用带有条件的匹配守卫（match guard）。
+
+#### 模式用法：多个模式
+
+在 match 表达式中，可以使用 | 语法匹配多个模式，它代表 或（or）的意思。例如，如下代码将 x 的值与匹配分支相比较，第一个分支有 或 选项，意味着如果 x 的值匹配此分支的任一个值，它就会运行：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let x = 1;
+
+match x {
+    1 | 2 => println!("one or two"),
+    3 => println!("three"),
+    _ => println!("anything"),
+}
+}
+```
+
+#### 通过 `..=` 匹配值的范围
+
+`..=` 语法允许你匹配一个闭区间范围内的值。在如下代码中，当模式匹配任何在此范围内的值时，该分支会执行：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let x = 5;
+
+match x {
+    1..=5 => println!("one through five"),
+    _ => println!("something else"),
+}
+}
+```
+
+如果 x 是 1、2、3、4 或 5，第一个分支就会匹配。这相比使用 | 运算符表达相同的意思更为方便；相比 1..=5，使用 | 则不得不指定 1 | 2 | 3 | 4 | 5。相反指定范围就简短的多，特别是在希望匹配比如从 1 到 1000 的数字的时候！
+
+范围只允许用于数字或 char 值，因为编译器会在编译时检查范围不为空。char 和 数字值是 Rust 仅有的可以判断范围是否为空的类型。
+
+如下是一个使用 char 类型值范围的例子：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let x = 'c';
+
+match x {
+    'a'..='j' => println!("early ASCII letter"),
+    'k'..='z' => println!("late ASCII letter"),
+    _ => println!("something else"),
+}
+}
+```
+
+#### 解构并分解值
+
+也可以使用模式来解构结构体、枚举、元组和引用，以便使用这些值的不同部分。
+
+##### 解构结构体
+
+```rust
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p = Point { x: 0, y: 7 };
+
+    let Point { x: a, y: b } = p;
+    assert_eq!(0, a);
+    assert_eq!(7, b);
+}
+
+```
+
+这段代码创建了变量 a 和 b 来匹配结构体 p 中的 x 和 y 字段。这个例子展示了模式中的变量名不必与结构体中的字段名一致。不过通常希望变量名与字段名一致以便于理解变量来自于哪些字段。
+
+```rust
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p = Point { x: 0, y: 7 };
+
+    let Point { x, y } = p;
+    assert_eq!(0, x);
+    assert_eq!(7, y);
+}
+
+```
+
+这段代码创建了变量 x 和 y，与变量 p 中的 x 和 y 相匹配。其结果是变量 x 和 y 包含结构体 p 中的值。
+
+也可以使用字面值作为结构体模式的一部分进行进行解构，而不是为所有的字段创建变量。这允许我们测试一些字段为特定值的同时创建其他字段的变量。
+
+下例 展示了一个 match 语句将 Point 值分成了三种情况：直接位于 x 轴上（此时 y = 0 为真）、位于 y 轴上（x = 0）或不在任何轴上的点。
+
+```rust
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p = Point { x: 0, y: 7 };
+
+    match p {
+        Point { x, y: 0 } => println!("On the x axis at {}", x),
+        Point { x: 0, y } => println!("On the y axis at {}", y),
+        Point { x, y } => println!("On neither axis: ({}, {})", x, y),
+    }
+}
+
+```
+
+第一个分支通过指定字段 y 匹配字面值 0 来匹配任何位于 x 轴上的点。此模式仍然创建了变量 x 以便在分支的代码中使用。
+
+类似的，第二个分支通过指定字段 x 匹配字面值 0 来匹配任何位于 y 轴上的点，并为字段 y 创建了变量 y。第三个分支没有指定任何字面值，所以其会匹配任何其他的 Point 并为 x 和 y 两个字段创建变量。
+
+在这个例子中，值 p 因为其 x 包含 0 而匹配第二个分支，因此会打印出 On the y axis at 7。
+
+##### 解构枚举
+
+```rust
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+fn main() {
+    let msg = Message::ChangeColor(0, 160, 255);
+
+    match msg {
+        Message::Quit => {
+            println!("The Quit variant has no data to destructure.")
+        }
+        Message::Move { x, y } => {
+            println!(
+                "Move in the x direction {} and in the y direction {}",
+                x,
+                y
+            );
+        }
+        Message::Write(text) => println!("Text message: {}", text),
+        Message::ChangeColor(r, g, b) => {
+            println!(
+                "Change the color to red {}, green {}, and blue {}",
+                r,
+                g,
+                b
+            )
+        }
+    }
+}
+
+```
+
+##### 解构嵌套的结构体和枚举
+
+```rust
+enum Color {
+   Rgb(i32, i32, i32),
+   Hsv(i32, i32, i32),
+}
+
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(Color),
+}
+
+fn main() {
+    let msg = Message::ChangeColor(Color::Hsv(0, 160, 255));
+
+    match msg {
+        Message::ChangeColor(Color::Rgb(r, g, b)) => {
+            println!(
+                "Change the color to red {}, green {}, and blue {}",
+                r,
+                g,
+                b
+            )
+        }
+        Message::ChangeColor(Color::Hsv(h, s, v)) => {
+            println!(
+                "Change the color to hue {}, saturation {}, and value {}",
+                h,
+                s,
+                v
+            )
+        }
+        _ => ()
+    }
+}
+
+```
+
+match 表达式第一个分支的模式匹配一个包含 Color::Rgb 枚举成员的 Message::ChangeColor 枚举成员，然后模式绑定了 3 个内部的 i32 值。第二个分支的模式也匹配一个 Message::ChangeColor 枚举成员， 但是其内部的枚举会匹配 Color::Hsv 枚举成员。可以在一个 match 表达式中指定这些复杂条件，即使会涉及到两个枚举。
+
+##### 解构结构体和元组
+
+甚至可以用复杂的方式来混合、匹配和嵌套解构模式。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+let ((feet, inches), Point {x, y}) = ((3, 10), Point { x: 3, y: -10 });
+}
+```
+
+#### 忽略模式中的值
+
+有时忽略模式中的一些值是有用的，比如 match 中最后捕获全部情况的分支实际上没有做任何事，但是它确实对所有剩余情况负责。有一些简单的方法可以忽略模式中全部或部分值：使用 _ 模式，在另一个模式中使用 _ 模式，使用一个以下划线开始的名称，或者使用 .. 忽略所剩部分的值。让我们来分别探索如何以及为什么要这么做。
+
+##### 使用 _ 忽略整个值
+
+已经使用过下划线（_）作为匹配但不绑定任何值的通配符模式了。虽然 _ 模式作为 match 表达式最后的分支特别有用，也可以将其用于任意模式，包括函数参数中
+
+```rust
+fn foo(_: i32, y: i32) {
+    println!("This code only uses the y parameter: {}", y);
+}
+
+fn main() {
+    foo(3, 4);
+}
+
+```
+
+这段代码会完全忽略作为第一个参数传递的值 3，并会打印出 This code only uses the y parameter: 4。
+
+大部分情况当你不再需要特定函数参数时，最好修改签名不再包含无用的参数。在一些情况下忽略函数参数会变得特别有用，比如实现 trait 时，当你需要特定类型签名但是函数实现并不需要某个参数时。此时编译器就不会警告说存在未使用的函数参数，就跟使用命名参数一样。
+
+##### 使用嵌套的 _ 忽略部分值
+
+也可以在一个模式内部使用_ 忽略部分值，例如，当只需要测试部分值但在期望运行的代码中没有用到其他部分时。下例  展示了负责管理设置值的代码。业务需求是用户不允许覆盖现有的自定义设置，但是可以取消设置，也可以在当前未设置时为其提供设置。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let mut setting_value = Some(5);
+let new_setting_value = Some(10);
+
+match (setting_value, new_setting_value) {
+    (Some(_), Some(_)) => {
+        println!("Can't overwrite an existing customized value");
+    }
+    _ => {
+        setting_value = new_setting_value;
+    }
+}
+
+println!("setting is {:?}", setting_value);
+}
+```
+
+这段代码会打印出 Can't overwrite an existing customized value 接着是 setting is Some(5)。在第一个匹配分支，我们不需要匹配或使用任一个 Some 成员中的值；重要的部分是需要测试 setting_value 和 new_setting_value 都为 Some 成员的情况。在这种情况，我们打印出为何不改变 setting_value，并且不会改变它。
+
+对于所有其他情况（setting_value 或 new_setting_value 任一为 None），这由第二个分支的 _ 模式体现，这时确实希望允许 new_setting_value 变为 setting_value。
+
+也可以在一个模式中的多处使用下划线来忽略特定值，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let numbers = (2, 4, 8, 16, 32);
+
+match numbers {
+    (first, _, third, _, fifth) => {
+        println!("Some numbers: {}, {}, {}", first, third, fifth)
+    },
+}
+}
+```
+
+##### 通过在名字前以一个下划线开头来忽略未使用的变量
+
+如果创建了一个变量却不在任何地方使用它, Rust 通常会给你一个警告，因为这可能会是个 bug。但是有时创建一个还未使用的变量是有用的，比如你正在设计原型或刚刚开始一个项目。这时你希望告诉 Rust 不要警告未使用的变量，为此可以用下划线作为变量名的开头。
+
+```rust
+fn main() {
+    let _x = 5;
+    let y = 10;
+}
+
+```
+
+这里得到了警告说未使用变量 y，不过没有警告说未使用下划线开头的变量。
+
+注意, 只使用 _ 和使用以下划线开头的名称有些微妙的不同：比如 _x 仍会将值绑定到变量，而 _ 则完全不会绑定。为了展示这个区别的意义。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let s = Some(String::from("Hello!"));
+
+if let Some(_) = s {
+    println!("found a string");
+}
+
+println!("{:?}", s);
+}
+```
+
+##### 用 .. 忽略剩余值
+
+对于有多个部分的值，可以使用 .. 语法来只使用部分并忽略其它值，同时避免不得不每一个忽略值列出下划线。.. 模式会忽略模式中剩余的任何没有显式匹配的值部分。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct Point {
+    x: i32,
+    y: i32,
+    z: i32,
+}
+
+let origin = Point { x: 0, y: 0, z: 0 };
+
+match origin {
+    Point { x, .. } => println!("x is {}", x),
+}
+}
+```
+
+```rust
+fn main() {
+    let numbers = (2, 4, 8, 16, 32);
+
+    match numbers {
+        (first, .., last) => {
+            println!("Some numbers: {}, {}", first, last);
+        },
+    }
+}
+
+```
+
+这里用 first 和 last 来匹配第一个和最后一个值。.. 将匹配并忽略中间的所有值。
+
+然而使用 .. 必须是无歧义的。如果期望匹配和忽略的值是不明确的，Rust 会报错。
+
+#### 匹配守卫提供的额外条件
+
+匹配守卫（match guard）是一个指定于 match 分支模式之后的额外 if 条件，它也必须被满足才能选择此分支。匹配守卫用于表达比单独的模式所能允许的更为复杂的情况。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let num = Some(4);
+
+match num {
+    Some(x) if x < 5 => println!("less than five: {}", x),
+    Some(x) => println!("{}", x),
+    None => (),
+}
+}
+```
+
+如何使用匹配守卫修复变量覆盖问题。
+
+```rust
+fn main() {
+    let x = Some(5);
+    let y = 10;
+
+    match x {
+        Some(50) => println!("Got 50"),
+        Some(n) if n == y => println!("Matched, n = {}", n),
+        _ => println!("Default case, x = {:?}", x),
+    }
+
+    println!("at the end: x = {:?}, y = {}", x, y);
+}
+
+```
+
+现在这会打印出 Default case, x = Some(5)。现在第二个匹配分支中的模式不会引入一个覆盖外部 y 的新变量 y，这意味着可以在匹配守卫中使用外部的 y。相比指定会覆盖外部 y 的模式 Some(y)，这里指定为 Some(n)。此新建的变量 n 并没有覆盖任何值，因为 match 外部没有变量 n。
+
+匹配守卫 if n == y 并不是一个模式所以没有引入新变量。这个 y 正是 外部的 y 而不是新的覆盖变量 y，这样就可以通过比较 n 和 y 来表达寻找一个与外部 y 相同的值的概念了。
+
+也可以在匹配守卫中使用 或 运算符 | 来指定多个模式，同时匹配守卫的条件会作用于所有的模式。下例  展示了结合匹配守卫与使用了 | 的模式的优先级。这个例子中重要的部分是匹配守卫 if y 作用于 4、5 和 6，即使这看起来好像 if y 只作用于 6：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let x = 4;
+let y = false;
+
+match x {
+    4 | 5 | 6 if y => println!("yes"),
+    _ => println!("no"),
+}
+}
+```
+
+这个匹配条件表明此分支值匹配 x 值为 4、5 或 6 同时 y 为 true 的情况。运行这段代码时会发生的是第一个分支的模式因 x 为 4 而匹配，不过匹配守卫 if y 为假，所以第一个分支不会被选择。代码移动到第二个分支，这会匹配，此程序会打印出 no。这是因为 if 条件作用于整个 4 | 5 | 6 模式，而不仅是最后的值 6。换句话说，匹配守卫与模式的优先级关系看起来像这样：
+
+```
+(4 | 5 | 6) if y => ...
+```
+
+而不是
+
+```
+4 | 5 | (6 if y) => ...
+```
+
+可以通过运行代码时的情况看出这一点：如果匹配守卫只作用于由 | 运算符指定的值列表的最后一个值，这个分支就会匹配且程序会打印出 yes。
+
+#### @ 绑定
+
+at 运算符（@）允许我们在创建一个存放值的变量的同时测试其值是否匹配模式。下例 展示了一个例子，这里我们希望测试 Message::Hello 的 id 字段是否位于 3...7 范围内，同时也希望能将其值绑定到 id_variable 变量中以便此分支相关联的代码可以使用它。可以将 id_variable 命名为 id，与字段同名，不过出于示例的目的这里选择了不同的名称。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum Message {
+    Hello { id: i32 },
+}
+
+let msg = Message::Hello { id: 5 };
+
+match msg {
+    Message::Hello { id: id_variable @ 3..=7 } => {
+        println!("Found an id in range: {}", id_variable)
+    },
+    Message::Hello { id: 10..=12 } => {
+        println!("Found an id in another range")
+    },
+    Message::Hello { id } => {
+        println!("Found some other id: {}", id)
+    },
+}
+}
+```
+
+上例会打印出 Found an id in range: 5。通过在 3...7 之前指定 id_variable @，我们捕获了任何匹配此范围的值并同时测试其值匹配这个范围模式。
+
+第二个分支只在模式中指定了一个范围，分支相关代码代码没有一个包含 id 字段实际值的变量。id 字段的值可以是 10、11 或 12，不过这个模式的代码并不知情也不能使用 id 字段中的值，因为没有将 id 值保存进一个变量。
+
+最后一个分支指定了一个没有范围的变量，此时确实拥有可以用于分支代码的变量 id，因为这里使用了结构体字段简写语法。不过此分支中没有像头两个分支那样对 id 字段的值进行测试：任何值都会匹配此分支。
+
+使用 @ 可以在一个模式中同时测试和保存变量值。
+
+### Rust高级特性
+
 
