@@ -147,6 +147,78 @@ fn main() {
 
 ## Rust基本概念
 
+### Rust关键字
+
+* as - 强制类型转换，消除特定包含项的 trait 的歧义，或者对 use 和 extern crate 语句中的项重命名
+* break - 立刻退出循环
+* const - 定义常量或不变裸指针（constant raw pointer）
+* continue - 继续进入下一次循环迭代
+* crate - 链接（link）一个外部 crate 或一个代表宏定义的 crate 的宏变量
+* dyn - 动态分发 trait 对象
+* else - 作为 if 和 if let 控制流结构的 fallback
+* enum - 定义一个枚举
+* extern - 链接一个外部 crate 、函数或变量
+* false - 布尔字面值 false
+* fn - 定义一个函数或 函数指针类型 (function pointer type)
+* for - 遍历一个迭代器或实现一个 trait 或者指定一个更高级的生命周期
+* if - 基于条件表达式的结果分支
+* impl - 实现自有或 trait 功能
+* in - for 循环语法的一部分
+* let - 绑定一个变量
+* loop - 无条件循环
+* match - 模式匹配
+* mod - 定义一个模块
+* move - 使闭包获取其所捕获项的所有权
+* mut - 表示引用、裸指针或模式绑定的可变性
+* pub - 表示结构体字段、impl 块或模块的公有可见性
+* ref - 通过引用绑定
+* return - 从函数中返回
+* Self - 实现 trait 的类型的类型别名
+* self - 表示方法本身或当前模块
+* static - 表示全局变量或在整个程序执行期间保持其生命周期
+* struct - 定义一个结构体
+* super - 表示当前模块的父模块
+* trait - 定义一个 trait
+* true - 布尔字面值 true
+* type - 定义一个类型别名或关联类型
+* unsafe - 表示不安全的代码、函数、trait 或实现
+* use - 引入外部空间的符号
+* where - 表示一个约束类型的从句
+* while - 基于一个表达式的结果判断是否进行循环
+
+### Rust保留关键字
+
+* abstract
+* async
+* await
+* become
+* box
+* do
+* final
+* macro
+* override
+* priv
+* try
+* typeof
+* unsized
+* virtual
+* yield
+
+### Rust原始标识符
+
+原始标识符（Raw identifiers）允许你使用通常不能使用的关键字，其带有 r# 前缀。
+
+```rust
+fn r#match(needle: &str, haystack: &str) -> bool {
+    haystack.contains(needle)
+}
+
+fn main() {
+    assert!(r#match("foo", "foobar"));
+}
+
+```
+
 ### Rust变量和可变性
 
 默认情况下变量是不可变的。这是Rust推动编写代码的一种方式，它可以利用Rust提供的安全性和易并发性。但是，仍然可以选择使变量可变。让探讨一下Rust如何以及为什么鼓励支持不变性，以及为什么有时可能想要退出。
@@ -371,6 +443,163 @@ fn main() {
 ```
 
 在此示例中，名为的变量`first`将获得值`1`，因为这是`[0]`数组中index处的值。名为的变量`second`将从数组中的`2`索引获取值`[1]`。
+
+### Rust运算符
+
+运算符|	示例|	解释|	是否可重载
+-|-|-|-
+`!`|	`ident!(...)`, `ident!{...}`, `ident![...]`|	宏展开	
+`!`	|`!expr`|	按位非或逻辑非 Not
+`!=`|	`var != expr`	|不等比较	PartialEq|
+`%`|	`expr % expr`|	算术取模	Rem|
+`%=`	|`var %= expr`|	算术取模与赋值	RemAssign|
+`&`	|`&expr`, `&mut expr`|	借用 |	
+`&`|	`&type`, `&mut type`, `&'a type`, `&'a mut type`|	借用指针类型	|
+`&`	|`expr & expr`|	按位与	BitAnd|
+`&=`	|`var &= expr`|	按位与及赋值	BitAndAssign|
+`&&`	|`expr && expr`|	逻辑与	|
+`*`	|`expr * expr`	|算术乘法	Mul|
+`*=`|	`var *= expr`	|算术乘法与赋值	MulAssign|
+`*`	|`*expr`|	解引用	|
+`*`	|`*const type`, `*mut type`|	裸指针	|
+`+`	|`trait + trait`, `'a + trait`|	复合类型限制	|
+`+`	|`expr + expr`	|算术加法	Add|
+`+=`|	`var += expr`	|算术加法与赋值	AddAssign|
+`,`	|`expr, expr`	|参数以及元素分隔符	|
+`-`	|`- expr`|	算术取负	Neg|
+`-`	| `expr - expr`	|算术减法	Sub|
+`-=`|	`var -= expr`	|算术减法与赋值	SubAssign|
+`->`|	`fn(...) -> type`, `|...| -> type`|	函数与闭包，返回类型	
+`.`	| `expr.ident`	|成员访问	|
+`..`|	`..`, `expr..`, `..expr`, `expr..expr`|	右排除范围	|
+`..`|	`..expr`|	结构体更新语法	|
+`..`|	`variant(x, ..)`, `struct_type { x, .. }`	|“与剩余部分”的模式绑定|	
+`...`|	`expr...expr`	|模式: 范围包含模式	|
+`/`	| `expr / expr`	|算术除法	Div|
+`/=`|	`var /= expr`	|算术除法与赋值	DivAssign|
+`:`	| `pat: type`, `ident: type`|	约束	|
+`:`	| `ident: expr`	|结构体字段初始化	|
+`:`	| `'a: loop {...}`	|循环标志	|
+`;`	| `expr;`	|语句和语句结束符	|
+`;`	| `[...; len]`	|固定大小数组语法的部分	|
+`<<`|	`expr << expr`	|左移	Shl|
+`<<=`|	`var <<= expr`	|左移与赋值	ShlAssign|
+`<`	|   `expr < expr`	|小于比较	PartialOrd|
+`<=`|	`expr <= expr`	|小于等于比较	PartialOrd|
+`=`	|   `var = expr`, `ident = type`|	赋值/等值	|
+`==`|	`expr == expr`|	等于比较	PartialEq|
+`=>`|	`pat => expr`	|匹配准备语法的部分	|
+`>`	|   `expr > expr`	|大于比较	PartialOrd|
+`>=`|	`expr >= expr`|	大于等于比较	PartialOrd|
+`>>`|	`expr >> expr`	|右移	Shr|
+`>>=`|	`var >>= expr`	|右移与赋值	ShrAssign|
+`@`	| `ident @ pat`	|模式绑定	|
+`^`	| `expr ^ expr`	|按位异或	BitXor|
+`^=`|	`var ^= expr`	|按位异或与赋值	BitXorAssign|
+`|`	| `pat | pat`	|模式选择	|
+`|`	| `expr | expr`|	按位或	BitOr|
+`|=`|	`var |= expr`	|按位或与赋值	BitOrAssign|
+`||`|	`expr || expr`|	逻辑或	|
+`?`|	`expr?`	|错误传播	|
+
+### Rust非运算符符号
+
+符号|	解释
+-|-
+`'ident`|	命名生命周期或循环标签
+`...u8`, `...i32`, `...f64`, `...usize`, 等|	指定类型的数值常量
+`"..."`|	字符串常量
+`r"..."`, `r#"..."#`, `r##"..."##`, 等.|	原始字符串字面值, 未处理的转义字符
+`b"..."`|	字节字符串字面值; 构造一个 `[u8]` 类型而非字符串
+`br"..."`, `br#"..."#`, `br##"..."##`, 等|	原始字节字符串字面值，原始和字节字符串字面值的结合
+`'...'`|	字符字面值
+`b'...'`|	ASCII 码字节字面值
+`|...| expr`|	闭包
+`!`	|离散函数的总是为空的类型
+`_`|	“忽略” 模式绑定；也用于增强整型字面值的可读性
+
+### Rust路径相关语法
+
+符号|	解释
+-|-
+`ident::ident`|	命名空间路径
+`::path`|	与 crate 根相对的路径（如一个显式绝对路径）
+`self::path`|	与当前模块相对的路径（如一个显式相对路径）
+`super::path`|	与父模块相对的路径
+`type::ident`, `<type as trait>::ident`|	关联常量、函数以及类型
+`<type>::...`|	不可以被直接命名的关联项类型（如 `<&T>::...`，`<[T]>::...`， 等）
+`trait::method(...)`|	通过命名定义的 trait 来消除方法调用的二义性
+`type::method(...)`	|通过命名定义的类型来消除方法调用的二义性
+`<type as trait>::method(...)`|	通过命名 trait 和类型来消除方法调用的二义性
+
+### Rust泛型符号
+
+符号|	解释
+-|-
+`path<...>`|	为一个类型中的泛型指定具体参数（如 `Vec<u8>`）
+`path::<...>`, `method::<...>`|	为一个泛型、函数或表达式中的方法指定具体参数，通常指 turbofish（如 `"42".parse::<i32>()`）
+`fn ident<...> ...`|	泛型函数定义
+`struct ident<...> ...`|	泛型结构体定义
+`enum ident<...> ...`|	泛型枚举定义
+`impl<...> ...`	|定义泛型实现
+`for<...> type`	|高级生命周期限制
+`type<ident=type>`|	泛型，其一个或多个相关类型必须被指定为特定类型（如 `Iterator<Item=T>`）
+
+### Rust Trait Bound约束
+
+符号|	解释
+-|-
+`T: U`|	泛型参数 T 约束于实现了 U 的类型
+`T: 'a`|	泛型 T 的生命周期必须长于 'a（意味着该类型不能传递包含生命周期短于 'a 的任何引用）
+`T : 'static`|	泛型 T 不包含除 'static 之外的借用引用
+`'b: 'a`|	泛型 'b 生命周期必须长于泛型 'a
+`T: ?Sized`|	使用一个不定大小的泛型类型
+`'a + trait`, `trait + trait`|	复合类型限制
+
+### Rust宏与属性
+
+符号|	解释
+-|-
+`#[meta]`|	外部属性
+`#![meta]`|	内部属性
+`$ident`|	宏替换
+`$ident:kind`|	宏捕获
+`$(…)…`|	宏重复
+
+### Rust注释
+
+符号|	注释
+-|-
+`//`|	行注释
+`//!`|	内部行文档注释
+`///`|	外部行文档注释
+`/*...*/`|	块注释
+`/*!...*/`|	内部块文档注释
+`/**...*/`|	外部块文档注释
+
+### Rust元组符号
+
+符号|	解释
+-|-
+`()`|	空元组（亦称单元），即是字面值也是类型
+`(expr)`|	括号表达式
+`(expr,)`|	单一元素元组表达式
+`(type,)`|	单一元素元组类型
+`(expr, ...)`|	元组表达式
+`(type, ...)`|	元组类型
+`expr(expr, ...)`|	函数调用表达式；也用于初始化元组结构体 struct 以及元组枚举 enum 变体
+`ident!(...)`, `ident!{...}`, `ident![...]`|	宏调用
+`expr.0`, `expr.1`, 等. |	元组索引
+
+### Rust方括号用法
+
+符号|	解释
+-|-
+`[...]`|	数组
+`[expr; len]`|	复制了 len个 expr的数组
+`[type; len]`|	包含 len个 type 类型的数组
+`expr[expr]`|	集合索引。 重载（Index, IndexMut）
+`expr[..]`, `expr[a..]`, `expr[..b]`, `expr[a..b]`|	集合索引，使用 Range，RangeFrom，RangeTo 或 RangeFull 作为索引来代替集合 slice
 
 ### Rust函数
 
@@ -1900,16 +2129,16 @@ for i in &mut v {
 
 #![allow(unused_variables)]
 fn main() {
-enum SpreadsheetCell {
+enum Spreadshe等ell {
     Int(i32),
     Float(f64),
     Text(String),
 }
 
 let row = vec![
-    SpreadsheetCell::Int(3),
-    SpreadsheetCell::Text(String::from("blue")),
-    SpreadsheetCell::Float(10.12),
+    Spreadshe等ell::Int(3),
+    Spreadshe等ell::Text(String::from("blue")),
+    Spreadshe等ell::Float(10.12),
 ];
 }
 
@@ -7364,13 +7593,13 @@ fn main() {
 
 看看当 match 语句运行的时候发生了什么。第一个匹配分支的模式并不匹配 x 中定义的值，所以代码继续执行。
 
-第二个匹配分支中的模式引入了一个新变量 y，它会匹配任何 Some 中的值。因为我们在 match 表达式的新作用域中，这是一个新变量，而不是开头声明为值 10 的那个 y。这个新的 y 绑定会匹配任何 Some 中的值，在这里是 x 中的值。因此这个 y 绑定了 x 中 Some 内部的值。这个值是 5，所以这个分支的表达式将会执行并打印出 Matched, y = 5。
+第二个匹配分支中的模式引入了一个新变量 y，它会匹配任何 Some 中的值。因为在 match 表达式的新作用域中，这是一个新变量，而不是开头声明为值 10 的那个 y。这个新的 y 绑定会匹配任何 Some 中的值，在这里是 x 中的值。因此这个 y 绑定了 x 中 Some 内部的值。这个值是 5，所以这个分支的表达式将会执行并打印出 Matched, y = 5。
 
 如果 x 的值是 None 而不是 Some(5)，头两个分支的模式不会匹配，所以会匹配下划线。这个分支的模式中没有引入变量 x，所以此时表达式中的 x 会是外部没有被覆盖的 x。在这个假想的例子中，match 将会打印 Default case, x = None。
 
 一旦 match 表达式执行完毕，其作用域也就结束了，同理内部 y 的作用域也结束了。最后的 println! 会打印 at the end: x = Some(5), y = 10。
 
-为了创建能够比较外部 x 和 y 的值，而不引入覆盖变量的 match 表达式，我们需要相应地使用带有条件的匹配守卫（match guard）。
+为了创建能够比较外部 x 和 y 的值，而不引入覆盖变量的 match 表达式，需要相应地使用带有条件的匹配守卫（match guard）。
 
 #### 模式用法：多个模式
 
@@ -7392,7 +7621,7 @@ match x {
 
 #### 通过 `..=` 匹配值的范围
 
-`..=` 语法允许你匹配一个闭区间范围内的值。在如下代码中，当模式匹配任何在此范围内的值时，该分支会执行：
+`..=` 语法允许匹配一个闭区间范围内的值。在如下代码中，当模式匹配任何在此范围内的值时，该分支会执行：
 
 ```rust
 
@@ -7469,7 +7698,7 @@ fn main() {
 
 这段代码创建了变量 x 和 y，与变量 p 中的 x 和 y 相匹配。其结果是变量 x 和 y 包含结构体 p 中的值。
 
-也可以使用字面值作为结构体模式的一部分进行进行解构，而不是为所有的字段创建变量。这允许我们测试一些字段为特定值的同时创建其他字段的变量。
+也可以使用字面值作为结构体模式的一部分进行进行解构，而不是为所有的字段创建变量。这允许测试一些字段为特定值的同时创建其他字段的变量。
 
 下例 展示了一个 match 语句将 Point 值分成了三种情况：直接位于 x 轴上（此时 y = 0 为真）、位于 y 轴上（x = 0）或不在任何轴上的点。
 
@@ -7597,7 +7826,7 @@ let ((feet, inches), Point {x, y}) = ((3, 10), Point { x: 3, y: -10 });
 
 #### 忽略模式中的值
 
-有时忽略模式中的一些值是有用的，比如 match 中最后捕获全部情况的分支实际上没有做任何事，但是它确实对所有剩余情况负责。有一些简单的方法可以忽略模式中全部或部分值：使用 _ 模式，在另一个模式中使用 _ 模式，使用一个以下划线开始的名称，或者使用 .. 忽略所剩部分的值。让我们来分别探索如何以及为什么要这么做。
+有时忽略模式中的一些值是有用的，比如 match 中最后捕获全部情况的分支实际上没有做任何事，但是它确实对所有剩余情况负责。有一些简单的方法可以忽略模式中全部或部分值：使用 _ 模式，在另一个模式中使用 _ 模式，使用一个以下划线开始的名称，或者使用 .. 忽略所剩部分的值。让来分别探索如何以及为什么要这么做。
 
 ##### 使用 _ 忽略整个值
 
@@ -7616,7 +7845,7 @@ fn main() {
 
 这段代码会完全忽略作为第一个参数传递的值 3，并会打印出 This code only uses the y parameter: 4。
 
-大部分情况当你不再需要特定函数参数时，最好修改签名不再包含无用的参数。在一些情况下忽略函数参数会变得特别有用，比如实现 trait 时，当你需要特定类型签名但是函数实现并不需要某个参数时。此时编译器就不会警告说存在未使用的函数参数，就跟使用命名参数一样。
+大部分情况当不再需要特定函数参数时，最好修改签名不再包含无用的参数。在一些情况下忽略函数参数会变得特别有用，比如实现 trait 时，当需要特定类型签名但是函数实现并不需要某个参数时。此时编译器就不会警告说存在未使用的函数参数，就跟使用命名参数一样。
 
 ##### 使用嵌套的 _ 忽略部分值
 
@@ -7642,7 +7871,7 @@ println!("setting is {:?}", setting_value);
 }
 ```
 
-这段代码会打印出 Can't overwrite an existing customized value 接着是 setting is Some(5)。在第一个匹配分支，我们不需要匹配或使用任一个 Some 成员中的值；重要的部分是需要测试 setting_value 和 new_setting_value 都为 Some 成员的情况。在这种情况，我们打印出为何不改变 setting_value，并且不会改变它。
+这段代码会打印出 Can't overwrite an existing customized value 接着是 setting is Some(5)。在第一个匹配分支，不需要匹配或使用任一个 Some 成员中的值；重要的部分是需要测试 setting_value 和 new_setting_value 都为 Some 成员的情况。在这种情况，打印出为何不改变 setting_value，并且不会改变它。
 
 对于所有其他情况（setting_value 或 new_setting_value 任一为 None），这由第二个分支的 _ 模式体现，这时确实希望允许 new_setting_value 变为 setting_value。
 
@@ -7664,7 +7893,7 @@ match numbers {
 
 ##### 通过在名字前以一个下划线开头来忽略未使用的变量
 
-如果创建了一个变量却不在任何地方使用它, Rust 通常会给你一个警告，因为这可能会是个 bug。但是有时创建一个还未使用的变量是有用的，比如你正在设计原型或刚刚开始一个项目。这时你希望告诉 Rust 不要警告未使用的变量，为此可以用下划线作为变量名的开头。
+如果创建了一个变量却不在任何地方使用它, Rust 通常会给一个警告，因为这可能会是个 bug。但是有时创建一个还未使用的变量是有用的，比如正在设计原型或刚刚开始一个项目。这时希望告诉 Rust 不要警告未使用的变量，为此可以用下划线作为变量名的开头。
 
 ```rust
 fn main() {
@@ -7803,7 +8032,7 @@ match x {
 
 #### @ 绑定
 
-at 运算符（@）允许我们在创建一个存放值的变量的同时测试其值是否匹配模式。下例 展示了一个例子，这里我们希望测试 Message::Hello 的 id 字段是否位于 3...7 范围内，同时也希望能将其值绑定到 id_variable 变量中以便此分支相关联的代码可以使用它。可以将 id_variable 命名为 id，与字段同名，不过出于示例的目的这里选择了不同的名称。
+at 运算符（@）允许在创建一个存放值的变量的同时测试其值是否匹配模式。下例 展示了一个例子，这里希望测试 Message::Hello 的 id 字段是否位于 3...7 范围内，同时也希望能将其值绑定到 id_variable 变量中以便此分支相关联的代码可以使用它。可以将 id_variable 命名为 id，与字段同名，不过出于示例的目的这里选择了不同的名称。
 
 ```rust
 
@@ -7829,7 +8058,7 @@ match msg {
 }
 ```
 
-上例会打印出 Found an id in range: 5。通过在 3...7 之前指定 id_variable @，我们捕获了任何匹配此范围的值并同时测试其值匹配这个范围模式。
+上例会打印出 Found an id in range: 5。通过在 3...7 之前指定 id_variable @，捕获了任何匹配此范围的值并同时测试其值匹配这个范围模式。
 
 第二个分支只在模式中指定了一个范围，分支相关代码代码没有一个包含 id 字段实际值的变量。id 字段的值可以是 10、11 或 12，不过这个模式的代码并不知情也不能使用 id 字段中的值，因为没有将 id 值保存进一个变量。
 
@@ -7850,9 +8079,9 @@ match msg {
 
 目前为止讨论过的代码都有 Rust 在编译时会强制执行的内存安全保证。然而，Rust 还隐藏有第二种语言，它不会强制执行这类内存安全保证：这被称为 不安全 Rust（unsafe Rust）。它与常规 Rust 代码无异，但是会提供额外的超级力量。
 
-不安全 Rust 之所以存在，是因为静态分析本质上是保守的。当编译器尝试确定一段代码是否支持某个保证时，拒绝一些有效的程序比接受无效程序要好一些。这必然意味着有时代码可能是合法的，但是 Rust 不这么认为！在这种情况下，可以使用不安全代码告诉编译器，“相信我，我知道我在干什么。”这么做的缺点就是你只能靠自己了：如果不安全代码出错了，比如解引用空指针，可能会导致不安全的内存使用。
+不安全 Rust 之所以存在，是因为静态分析本质上是保守的。当编译器尝试确定一段代码是否支持某个保证时，拒绝一些有效的程序比接受无效程序要好一些。这必然意味着有时代码可能是合法的，但是 Rust 不这么认为！在这种情况下，可以使用不安全代码告诉编译器，“相信我，我知道我在干什么。”这么做的缺点就是只能靠自己了：如果不安全代码出错了，比如解引用空指针，可能会导致不安全的内存使用。
 
-另一个 Rust 存在不安全一面的原因是：底层计算机硬件固有的不安全性。如果 Rust 不允许进行不安全操作，那么有些任务则根本完成不了。Rust 需要能够进行像直接与操作系统交互，甚至于编写你自己的操作系统这样的底层系统编程！这也是 Rust 语言的目标之一。
+另一个 Rust 存在不安全一面的原因是：底层计算机硬件固有的不安全性。如果 Rust 不允许进行不安全操作，那么有些任务则根本完成不了。Rust 需要能够进行像直接与操作系统交互，甚至于编写自己的操作系统这样的底层系统编程！这也是 Rust 语言的目标之一。
 
 ##### 不安全的超级力量
 
@@ -7864,15 +8093,15 @@ match msg {
 * 实现不安全 trait
 * 访问 union 的字段
 
-有一点很重要，unsafe 并不会关闭借用检查器或禁用任何其他 Rust 安全检查：如果在不安全代码中使用引用，它仍会被检查。unsafe 关键字只是提供了那四个不会被编译器检查内存安全的功能。你仍然能在不安全块中获得某种程度的安全。
+有一点很重要，unsafe 并不会关闭借用检查器或禁用任何其他 Rust 安全检查：如果在不安全代码中使用引用，它仍会被检查。unsafe 关键字只是提供了那四个不会被编译器检查内存安全的功能。仍然能在不安全块中获得某种程度的安全。
 
-再者，unsafe 不意味着块中的代码就一定是危险的或者必然导致内存安全问题：其意图在于作为程序员你将会确保 unsafe 块中的代码以有效的方式访问内存。
+再者，unsafe 不意味着块中的代码就一定是危险的或者必然导致内存安全问题：其意图在于作为程序员将会确保 unsafe 块中的代码以有效的方式访问内存。
 
-人是会犯错误的，错误总会发生，不过通过要求这四类操作必须位于标记为 unsafe 的块中，就能够知道任何与内存安全相关的错误必定位于 unsafe 块内。保持 unsafe 块尽可能小，如此当之后调查内存 bug 时就会感谢你自己了。
+人是会犯错误的，错误总会发生，不过通过要求这四类操作必须位于标记为 unsafe 的块中，就能够知道任何与内存安全相关的错误必定位于 unsafe 块内。保持 unsafe 块尽可能小，如此当之后调查内存 bug 时就会感谢自己了。
 
-为了尽可能隔离不安全代码，将不安全代码封装进一个安全的抽象并提供安全 API 是一个好主意，当我们学习不安全函数和方法时会讨论到。标准库的一部分被实现为在被评审过的不安全代码之上的安全抽象。这个技术防止了 unsafe 泄露到所有你或者用户希望使用由 unsafe 代码实现的功能的地方，因为使用其安全抽象是安全的。
+为了尽可能隔离不安全代码，将不安全代码封装进一个安全的抽象并提供安全 API 是一个好主意，当学习不安全函数和方法时会讨论到。标准库的一部分被实现为在被评审过的不安全代码之上的安全抽象。这个技术防止了 unsafe 泄露到所有或者用户希望使用由 unsafe 代码实现的功能的地方，因为使用其安全抽象是安全的。
 
-让我们按顺序依次介绍上述四个超级力量，同时我们会看到一些提供不安全代码的安全接口的抽象。
+让按顺序依次介绍上述四个超级力量，同时会看到一些提供不安全代码的安全接口的抽象。
 
 ###### 解引用裸指针
 
@@ -7885,7 +8114,7 @@ match msg {
 * 允许为空
 * 不能实现任何自动清理功能
 
-通过去掉 Rust 强加的保证，你可以放弃安全保证以换取性能或使用另一个语言或硬件接口的能力，此时 Rust 的保证并不适用。
+通过去掉 Rust 强加的保证，可以放弃安全保证以换取性能或使用另一个语言或硬件接口的能力，此时 Rust 的保证并不适用。
 
 下例展示了如何从引用同时创建不可变和可变裸指针。
 
@@ -7915,7 +8144,7 @@ let r = address as *const i32;
 }
 ```
 
-说过可以在安全代码中创建裸指针，不过不能 解引用 裸指针和读取其指向的数据。现在我们要做的就是对裸指针使用解引用运算符 *，这需要一个 unsafe 块，如下例所示：
+说过可以在安全代码中创建裸指针，不过不能 解引用 裸指针和读取其指向的数据。现在要做的就是对裸指针使用解引用运算符 *，这需要一个 unsafe 块，如下例所示：
 
 ```rust
 
@@ -7941,7 +8170,7 @@ unsafe {
 
 ###### 调用不安全函数或方法
 
-第二类要求使用不安全块的操作是调用不安全函数。不安全函数和方法与常规函数方法十分类似，除了其开头有一个额外的 unsafe。unsafe 表明我们作为程序需要满足其要求，因为 Rust 不会保证满足这些要求。通过在 unsafe 块中调用不安全函数，我们表明已经阅读过此函数的文档并对其是否满足函数自身的契约负责。
+第二类要求使用不安全块的操作是调用不安全函数。不安全函数和方法与常规函数方法十分类似，除了其开头有一个额外的 unsafe。unsafe 表明作为程序需要满足其要求，因为 Rust 不会保证满足这些要求。通过在 unsafe 块中调用不安全函数，表明已经阅读过此函数的文档并对其是否满足函数自身的契约负责。
 
 ```rust
 
@@ -7957,7 +8186,7 @@ unsafe {
 
 ###### 创建不安全代码的安全抽象
 
-仅仅因为函数包含不安全代码并不意味着整个函数都需要标记为不安全的。事实上，将不安全代码封装进安全函数是一个常见的抽象。作为一个例子，标准库中的函数，split_at_mut，它需要一些不安全代码，让我们探索如何可以实现它。这个安全函数定义于可变 slice 之上：它获取一个 slice 并从给定的索引参数开始将其分为两个 slice。split_at_mut 的用法如下例 所示：
+仅仅因为函数包含不安全代码并不意味着整个函数都需要标记为不安全的。事实上，将不安全代码封装进安全函数是一个常见的抽象。作为一个例子，标准库中的函数，split_at_mut，它需要一些不安全代码，让探索如何可以实现它。这个安全函数定义于可变 slice 之上：它获取一个 slice 并从给定的索引参数开始将其分为两个 slice。split_at_mut 的用法如下例 所示：
 
 ```rust
 
@@ -7974,7 +8203,7 @@ assert_eq!(b, &mut [4, 5, 6]);
 }
 ```
 
-Rust 的借用检查器不能理解我们要借用这个 slice 的两个不同部分：它只知道我们借用了同一个 slice 两次。本质上借用 slice 的不同部分是可以的，因为结果两个 slice 不会重叠，不过 Rust 还没有智能到能够理解这些。当我们知道某些事是可以的而 Rust 不知道的时候，就是触及不安全代码的时候了
+Rust 的借用检查器不能理解要借用这个 slice 的两个不同部分：它只知道借用了同一个 slice 两次。本质上借用 slice 的不同部分是可以的，因为结果两个 slice 不会重叠，不过 Rust 还没有智能到能够理解这些。当知道某些事是可以的而 Rust 不知道的时候，就是触及不安全代码的时候了
 
 下例 展示了如何使用 unsafe 块，裸指针和一些不安全函数调用来实现 split_at_mut：
 
@@ -8000,11 +8229,11 @@ fn split_at_mut(slice: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {
 
 slice 是一个指向一些数据的指针，并带有该 slice 的长度。可以使用 len 方法获取 slice 的长度，使用 as_mut_ptr 方法访问 slice 的裸指针。在这个例子中，因为有一个 i32 值的可变 slice，as_mut_ptr 返回一个 *mut i32 类型的裸指针，储存在 ptr 变量中。
 
-我们保持索引 mid 位于 slice 中的断言。接着是不安全代码：slice::from_raw_parts_mut 函数获取一个裸指针和一个长度来创建一个 slice。这里使用此函数从 ptr 中创建了一个有 mid 个项的 slice。之后在 ptr 上调用 offset 方法并使用 mid 作为参数来获取一个从 mid 开始的裸指针，使用这个裸指针并以 mid 之后项的数量为长度创建一个 slice。
+保持索引 mid 位于 slice 中的断言。接着是不安全代码：slice::from_raw_parts_mut 函数获取一个裸指针和一个长度来创建一个 slice。这里使用此函数从 ptr 中创建了一个有 mid 个项的 slice。之后在 ptr 上调用 offset 方法并使用 mid 作为参数来获取一个从 mid 开始的裸指针，使用这个裸指针并以 mid 之后项的数量为长度创建一个 slice。
 
-slice::from_raw_parts_mut 函数是不安全的因为它获取一个裸指针，并必须确信这个指针是有效的。裸指针上的 offset 方法也是不安全的，因为其必须确信此地址偏移量也是有效的指针。因此必须将 slice::from_raw_parts_mut 和 offset 放入 unsafe 块中以便能调用它们。通过观察代码，和增加 mid 必然小于等于 len 的断言，我们可以说 unsafe 块中所有的裸指针将是有效的 slice 中数据的指针。这是一个可以接受的 unsafe 的恰当用法。
+slice::from_raw_parts_mut 函数是不安全的因为它获取一个裸指针，并必须确信这个指针是有效的。裸指针上的 offset 方法也是不安全的，因为其必须确信此地址偏移量也是有效的指针。因此必须将 slice::from_raw_parts_mut 和 offset 放入 unsafe 块中以便能调用它们。通过观察代码，和增加 mid 必然小于等于 len 的断言，可以说 unsafe 块中所有的裸指针将是有效的 slice 中数据的指针。这是一个可以接受的 unsafe 的恰当用法。
 
-注意无需将 split_at_mut 函数的结果标记为 unsafe，并可以在安全 Rust 中调用此函数。我们创建了一个不安全代码的安全抽象，其代码以一种安全的方式使用了 unsafe 代码，因为其只从这个函数访问的数据中创建了有效的指针。
+注意无需将 split_at_mut 函数的结果标记为 unsafe，并可以在安全 Rust 中调用此函数。创建了一个不安全代码的安全抽象，其代码以一种安全的方式使用了 unsafe 代码，因为其只从这个函数访问的数据中创建了有效的指针。
 
 与此相对，下例 中的 slice::from_raw_parts_mut 在使用 slice 时很有可能会崩溃。这段代码获取任意内存地址并创建了一个长为一万的 slice：
 
@@ -8044,7 +8273,7 @@ fn main() {
 
 ```
 
-在 extern "C" 块中，列出了我们希望能够调用的另一个语言中的外部函数的签名和名称。"C" 部分定义了外部函数所使用的 应用程序接口（application binary interface，ABI） —— ABI 定义了如何在汇编语言层面调用此函数。"C" ABI 是最常见的，并遵循 C 编程语言的 ABI。
+在 extern "C" 块中，列出了希望能够调用的另一个语言中的外部函数的签名和名称。"C" 部分定义了外部函数所使用的 应用程序接口（application binary interface，ABI） —— ABI 定义了如何在汇编语言层面调用此函数。"C" ABI 是最常见的，并遵循 C 编程语言的 ABI。
 
 ##### 访问或修改可变静态变量
 
@@ -8086,7 +8315,7 @@ fn main() {
 
 ```
 
-就像常规变量一样，我们使用 mut 关键来指定可变性。任何读写 COUNTER 的代码都必须位于 unsafe 块中。这段代码可以编译并如期打印出 COUNTER: 3，因为这是单线程的。拥有多个线程访问 COUNTER 则可能导致数据竞争。
+就像常规变量一样，使用 mut 关键来指定可变性。任何读写 COUNTER 的代码都必须位于 unsafe 块中。这段代码可以编译并如期打印出 COUNTER: 3，因为这是单线程的。拥有多个线程访问 COUNTER 则可能导致数据竞争。
 
 拥有可以全局访问的可变数据，难以保证不存在数据竞争，这就是为何 Rust 认为可变静态变量是不安全的。任何可能的情况，请优先使用第十六章讨论的并发技术和线程安全智能指针，这样编译器就能检测不同线程间的数据访问是否是安全的。
 
@@ -8134,7 +8363,7 @@ Item 是一个占位类型，同时 next 方法定义表明它返回 Option<Self
 
 关联类型看起来像一个类似泛型的概念，因为它允许定义一个函数而不指定其可以处理的类型。那么为什么要使用关联类型呢？
 
-让我们通过一个在第十三章中出现的 Counter 结构体上实现 Iterator trait 的例子来检视其中的区别。在下例中，指定了 Item 的类型为 u32：
+让通过一个在第十三章中出现的 Counter 结构体上实现 Iterator trait 的例子来检视其中的区别。在下例中，指定了 Item 的类型为 u32：
 
 ```rust
 impl Iterator for Counter {
@@ -8198,9 +8427,9 @@ trait Add<RHS=Self> {
 
 这看来应该很熟悉，这是一个带有一个方法和一个关联类型的 trait。比较陌生的部分是尖括号中的 RHS=Self：这个语法叫做 默认类型参数（default type parameters）。RHS 是一个泛型类型参数（“right hand side” 的缩写），它用于定义 add 方法中的 rhs 参数。如果实现 Add trait 时不指定 RHS 的具体类型，RHS 的类型将是默认的 Self 类型，也就是在其上实现 Add 的类型。
 
-当为 Point 实现 Add 时，使用了默认的 RHS，因为我们希望将两个 Point 实例相加。让我们看看一个实现 Add trait 时希望自定义 RHS 类型而不是使用默认类型的例子
+当为 Point 实现 Add 时，使用了默认的 RHS，因为希望将两个 Point 实例相加。让看看一个实现 Add trait 时希望自定义 RHS 类型而不是使用默认类型的例子
 
-这里有两个存放不同单元值的结构体，Millimeters 和 Meters。我们希望能够将毫米值与米值相加，并让 Add 的实现正确处理转换。可以为 Millimeters 实现 Add 并以 Meters 作为 RHS，如下面所示
+这里有两个存放不同单元值的结构体，Millimeters 和 Meters。希望能够将毫米值与米值相加，并让 Add 的实现正确处理转换。可以为 Millimeters 实现 Add 并以 Meters 作为 RHS，如下面所示
 
 ```rust
 
@@ -8221,16 +8450,16 @@ impl Add<Meters> for Millimeters {
 }
 ```
 
-为了使 Millimeters 和 Meters 能够相加，我们指定 `impl Add<Meters>` 来设定 RHS 类型参数的值而不是使用默认的 Self。
+为了使 Millimeters 和 Meters 能够相加，指定 `impl Add<Meters>` 来设定 RHS 类型参数的值而不是使用默认的 Self。
 
 默认参数类型主要用于如下两个方面：
 
 * 扩展类型而不破坏现有代码。
 * 在大部分用户都不需要的特定情况进行自定义。
 
-标准库的 Add trait 就是一个第二个目的例子：大部分时候你会将两个相似的类型相加，不过它提供了自定义额外行为的能力。在 Add trait 定义中使用默认类型参数意味着大部分时候无需指定额外的参数。换句话说，一小部分实现的样板代码是不必要的，这样使用 trait 就更容易了。
+标准库的 Add trait 就是一个第二个目的例子：大部分时候会将两个相似的类型相加，不过它提供了自定义额外行为的能力。在 Add trait 定义中使用默认类型参数意味着大部分时候无需指定额外的参数。换句话说，一小部分实现的样板代码是不必要的，这样使用 trait 就更容易了。
 
-第一个目的是相似的，但过程是反过来的：如果需要为现有 trait 增加类型参数，为其提供一个默认类型将允许我们在不破坏现有实现代码的基础上扩展 trait 的功能。
+第一个目的是相似的，但过程是反过来的：如果需要为现有 trait 增加类型参数，为其提供一个默认类型将允许在不破坏现有实现代码的基础上扩展 trait 的功能。
 
 ###### 完全限定语法与消歧义：调用相同名称的方法
 
@@ -8274,7 +8503,7 @@ impl Human {
 
 当调用 Human 实例的 fly 时，编译器默认调用直接是现在类型上的方法
 
-然而，关联函数是 trait 的一部分，但没有 self 参数。当同一作用域的两个类型实现了同一 trait，Rust 就不能计算出我们期望的是哪一个类型，除非使用 完全限定语法（fully qualified syntax）。例如，拿下例 中的 Animal trait 来说，它有关联函数 baby_name，结构体 Dog 实现了 Animal，同时有关联函数 baby_name 直接定义于 Dog 之上：
+然而，关联函数是 trait 的一部分，但没有 self 参数。当同一作用域的两个类型实现了同一 trait，Rust 就不能计算出期望的是哪一个类型，除非使用 完全限定语法（fully qualified syntax）。例如，拿下例 中的 Animal trait 来说，它有关联函数 baby_name，结构体 Dog 实现了 Animal，同时有关联函数 baby_name 直接定义于 Dog 之上：
 
 ```rust
 trait Animal {
@@ -8309,11 +8538,11 @@ fn main() {
 A baby dog is called a Spot
 ```
 
-对于关联函数，其没有一个 receiver，故只会有其他参数的列表。可以选择在任何函数或方法调用处使用完全限定语法。然而，允许省略任何 Rust 能够从程序中的其他信息中计算出的部分。只有当存在多个同名实现而 Rust 需要帮助以便知道我们希望调用哪个实现时，才需要使用这个较为冗长的语法。
+对于关联函数，其没有一个 receiver，故只会有其他参数的列表。可以选择在任何函数或方法调用处使用完全限定语法。然而，允许省略任何 Rust 能够从程序中的其他信息中计算出的部分。只有当存在多个同名实现而 Rust 需要帮助以便知道希望调用哪个实现时，才需要使用这个较为冗长的语法。
 
 ###### 父 trait 用于在另一个 trait 中使用某 trait 的功能
 
-有时我们可能会需要某个 trait 使用另一个 trait 的功能。在这种情况下，需要能够依赖相关的 trait 也被实现。这个所需的 trait 是我们实现的 trait 的 父（超） trait（supertrait）。
+有时可能会需要某个 trait 使用另一个 trait 的功能。在这种情况下，需要能够依赖相关的 trait 也被实现。这个所需的 trait 是实现的 trait 的 父（超） trait（supertrait）。
 
 ```rust
 
@@ -8337,7 +8566,7 @@ trait OutlinePrint: fmt::Display {
 
 因为指定了 OutlinePrint 需要 Display trait，则可以在 outline_print 中使用 to_string， 其会为任何实现 Display 的类型自动实现。如果不在 trait 名后增加 : Display 并尝试在 outline_print 中使用 to_string，则会得到一个错误说在当前作用域中没有找到用于 &Self 类型的方法 to_string。
 
-让我们看看如果尝试在一个没有实现 Display 的类型上实现 OutlinePrint 会发生什么，比如 Point 结构体：
+让看看如果尝试在一个没有实现 Display 的类型上实现 OutlinePrint 会发生什么，比如 Point 结构体：
 
 ```rust
 
@@ -8396,6 +8625,1919 @@ fn main() {
 
 Display 的实现使用 self.0 来访问其内部的 `Vec<T>`，因为 Wrapper 是元组结构体而 `Vec<T>` 是结构体总位于索引 0 的项。接着就可以使用 Wrapper 中 Display 的功能了。
 
-此方法的缺点是，因为 Wrapper 是一个新类型，它没有定义于其值之上的方法；必须直接在 Wrapper 上实现 `Vec<T>` 的所有方法，这样就可以代理到self.0 上 —— 这就允许我们完全像 `Vec<T>` 那样对待 Wrapper。如果希望新类型拥有其内部类型的每一个方法，为封装类型实现 Deref trait（第十五章 “通过 Deref trait 将智能指针当作常规引用处理” 部分讨论过）并返回其内部类型是一种解决方案。如果不希望封装类型拥有所有内部类型的方法 —— 比如为了限制封装类型的行为 —— 则必须只自行实现所需的方法。
+此方法的缺点是，因为 Wrapper 是一个新类型，它没有定义于其值之上的方法；必须直接在 Wrapper 上实现 `Vec<T>` 的所有方法，这样就可以代理到self.0 上 —— 这就允许完全像 `Vec<T>` 那样对待 Wrapper。如果希望新类型拥有其内部类型的每一个方法，为封装类型实现 Deref trait（第十五章 “通过 Deref trait 将智能指针当作常规引用处理” 部分讨论过）并返回其内部类型是一种解决方案。如果不希望封装类型拥有所有内部类型的方法 —— 比如为了限制封装类型的行为 —— 则必须只自行实现所需的方法。
 
 #### 高级类型
+
+Rust 的类型系统有一些曾经提到但没有讨论过的功能。首先从一个关于为什么 newtype 与类型一样有用的更宽泛的讨论开始。接着会转向类型别名（type aliases），一个类似于 newtype 但有着稍微不同的语义的功能。还会讨论 `!` 类型和动态大小类型。
+
+### 为了类型安全和抽象而使用 newtype 模式
+
+newtype 模式可以用于一些其他还未讨论的功能，包括静态的确保某值不被混淆，和用来表示一个值的单元。实际上示例 19-23 中已经有一个这样的例子：Millimeters 和 Meters 结构体都在 newtype 中封装了 u32 值。如果编写了一个有 Millimeters 类型参数的函数，不小心使用 Meters 或普通的 u32 值来调用该函数的程序是不能编译的。
+
+另一个 newtype 模式的应用在于抽象掉一些类型的实现细节：例如，封装类型可以暴露出与直接使用其内部私有类型时所不同的公有 API，以便限制其功能。
+
+newtype 也可以隐藏其内部的泛型类型。例如，可以提供一个封装了 `HashMap<i32, String>` 的 People 类型，用来储存人名以及相应的 ID。使用 People 的代码只需与提供的公有 API 交互即可，比如向 People 集合增加名字字符串的方法，这样这些代码就无需知道在内部将一个 i32 ID 赋予了这个名字了。
+
+#### 类型别名用来创建类型同义词
+
+连同 newtype 模式，Rust 还提供了声明 类型别名（type alias）的能力，使用 type 关键字来给予现有类型另一个名字。例如，可以像这样创建 i32 的别名 Kilometers：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+type Kilometers = i32;
+}
+```
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+type Kilometers = i32;
+
+let x: i32 = 5;
+let y: Kilometers = 5;
+
+println!("x + y = {}", x + y);
+}
+```
+
+因为 Kilometers 是 i32 的别名，他们是同一类型，可以将 i32 与 Kilometers 相加，也可以将 Kilometers 传递给获取 i32 参数的函数。但通过这种手段无法获得上一部分讨论的 newtype 模式所提供的类型检查的好处。
+
+类型别名的主要用途是减少重复。
+
+```rust
+Box<dyn Fn() + Send + 'static>
+
+```
+
+在函数签名或类型注解中每次都书写这个类型将是枯燥且易于出错的。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let f: Box<dyn Fn() + Send + 'static> = Box::new(|| println!("hi"));
+
+fn takes_long_type(f: Box<dyn Fn() + Send + 'static>) {
+    // --snip--
+}
+
+fn returns_long_type() -> Box<dyn Fn() + Send + 'static> {
+    // --snip--
+    Box::new(|| ())
+}
+}
+```
+
+类型别名通过减少项目中重复代码的数量来使其更加易于控制。这里为这个冗长的类型引入了一个叫做 Thunk 的别名，这样就可以如下例 所示将所有使用这个类型的地方替换为更短的 Thunk：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+type Thunk = Box<dyn Fn() + Send + 'static>;
+
+let f: Thunk = Box::new(|| println!("hi"));
+
+fn takes_long_type(f: Thunk) {
+    // --snip--
+}
+
+fn returns_long_type() -> Thunk {
+    // --snip--
+    Box::new(|| ())
+}
+}
+```
+
+这样就读写起来就容易多了！为类型别名选择一个好名字也可以帮助表达意图（单词 thunk 表示会在之后被计算的代码，所以这是一个存放闭包的合适的名字）。
+
+类型别名也经常与 `Result<T, E>` 结合使用来减少重复。考虑一下标准库中的 std::io 模块。I/O 操作通常会返回一个 `Result<T, E>`，因为这些操作可能会失败。标准库中的 std::io::Error 结构体代表了所有可能的 I/O 错误。std::io 中大部分函数会返回 Result<T, E>，其中 E 是 std::io::Error，比如 Write trait 中的这些函数：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io::Error;
+use std::fmt;
+
+pub trait Write {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, Error>;
+    fn flush(&mut self) -> Result<(), Error>;
+
+    fn write_all(&mut self, buf: &[u8]) -> Result<(), Error>;
+    fn write_fmt(&mut self, fmt: fmt::Arguments) -> Result<(), Error>;
+}
+}
+```
+
+这里出现了很多的 Result<..., Error>。为此，std::io 有这个类型别名声明：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+type Result<T> = std::result::Result<T, std::io::Error>;
+}
+```
+
+因为这位于 std::io 中，可用的完全限定的别名是 `std::io::Result<T>` —— 也就是说，`Result<T, E>` 中 E 放入了 std::io::Error。Write trait 中的函数最终看起来像这样：
+
+```rust
+pub trait Write {
+    fn write(&mut self, buf: &[u8]) -> Result<usize>;
+    fn flush(&mut self) -> Result<()>;
+
+    fn write_all(&mut self, buf: &[u8]) -> Result<()>;
+    fn write_fmt(&mut self, fmt: Arguments) -> Result<()>;
+}
+
+```
+
+类型别名在两个方面有帮助：易于编写 并 在整个 std::io 中提供了一致的接口。因为这是一个别名，它只是另一个 `Result<T, E>`，这意味着可以在其上使用 `Result<T, E>` 的任何方法，以及像 ? 这样的特殊语法。
+
+#### 从不返回的 never type
+
+Rust 有一个叫做 ! 的特殊类型。在类型理论术语中，它被称为 empty type，因为它没有值。更倾向于称之为 never type。这个名字描述了它的作用：在函数从不返回的时候充当返回值。例如：
+
+```rust
+fn bar() -> ! {
+    // --snip--
+}
+
+```
+
+这读 “函数 bar 从不返回”，而从不返回的函数被称为 发散函数（diverging functions）。不能创建 ! 类型的值，所以 bar 也不可能返回值。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let guess = "3";
+loop {
+let guess: u32 = match guess.trim().parse() {
+    Ok(num) => num,
+    Err(_) => continue,
+};
+break;
+}
+}
+```
+
+这里的 guess 必须既是整型 也是 字符串，而 Rust 要求 guess 只能是一个类型。那么 continue 返回了什么呢？为什么示例 19-26 中会允许一个分支返回 u32 而另一个分支却以 continue 结束呢？
+
+正如可能猜到的，continue 的值是 !。也就是说，当 Rust 要计算 guess 的类型时，它查看这两个分支。前者是 u32 值，而后者是 ! 值。因为 ! 并没有一个值，Rust 决定 guess 的类型是 u32。
+
+描述 ! 的行为的正式方式是 never type 可以强转为任何其他类型。允许 match 的分支以 continue 结束是因为 continue 并不真正返回一个值；相反它把控制权交回上层循环，所以在 Err 的情况，事实上并未对 guess 赋值。
+
+never type 的另一个用途是 panic!。还记得 `Option<T>` 上的 unwrap 函数吗？它产生一个值或 panic。这里是它的定义：
+
+```rust
+impl<T> Option<T> {
+    pub fn unwrap(self) -> T {
+        match self {
+            Some(val) => val,
+            None => panic!("called `Option::unwrap()` on a `None` value"),
+        }
+    }
+}
+
+```
+
+#### 动态大小类型和 Sized trait
+
+因为 Rust 需要知道例如应该为特定类型的值分配多少空间这样的信息其类型系统的一个特定的角落可能令人迷惑：这就是 动态大小类型（dynamically sized types）的概念。这有时被称为 “DST” 或 “unsized types”，这些类型允许处理只有在运行时才知道大小的类型。
+
+让深入研究一个贯穿本书都在使用的动态大小类型的细节：str。没错，不是 &str，而是 str 本身。str 是一个 DST；直到运行时都不知道字符串有多长。因为直到运行时都不能知道大其小，也就意味着不能创建 str 类型的变量，也不能获取 str 类型的参数。
+
+Rust 需要知道应该为特定类型的值分配多少内存，同时所有同一类型的值必须使用相同数量的内存。如果允许编写这样的代码，也就意味着这两个 str 需要占用完全相同大小的空间，不过它们有着不同的长度。这也就是为什么不可能创建一个存放动态大小类型的变量的原因。
+
+那么该怎么办呢？已经知道了这种问题的答案：s1 和 s2 的类型是 &str 而不是 str。
+
+所以虽然 &T 是一个储存了 T 所在的内存位置的单个值，&str 则是 两个 值：str 的地址和其长度。这样，&str 就有了一个在编译时可以知道的大小：它是 usize 长度的两倍。也就是说，总是知道 &str 的大小，而无论其引用的字符串是多长。这里是 Rust 中动态大小类型的常规用法：他们有一些额外的元信息来储存动态信息的大小。这引出了动态大小类型的黄金规则：必须将动态大小类型的值置于某种指针之后。
+
+为了处理 DST，Rust 有一个特定的 trait 来决定一个类型的大小是否在编译时可知：这就是 Sized trait。这个 trait 自动为编译器在编译时就知道大小的类型实现。另外，Rust 隐式的为每一个泛型函数增加了 Sized bound。也就是说，对于如下泛型函数定义：
+
+```rust
+fn generic<T>(t: T) {
+    // --snip--
+}
+
+```
+
+实际上被当作如下处理：
+
+```rust
+fn generic<T: Sized>(t: T) {
+    // --snip--
+}
+
+```
+
+泛型函数默认只能用于在编译时已知大小的类型。然而可以使用如下特殊语法来放宽这个限制：
+
+```rust
+fn generic<T: ?Sized>(t: &T) {
+    // --snip--
+}
+
+```
+
+?Sized trait bound 与 Sized 相对；也就是说，它可以读作 “T 可能是也可能不是 Sized 的”。这个语法只能用于 Sized ，而不能用于其他 trait。
+
+另外注意将 t 参数的类型从 T 变为了 &T：因为其类型可能不是 Sized 的，所以需要将其置于某种指针之后。在这个例子中选择了引用。
+
+#### 高级函数与闭包
+
+讨论过了如何向函数传递闭包；也可以向函数传递常规函数！这在希望传递已经定义的函数而不是重新定义闭包作为参数是很有用。通过函数指针允许使用函数作为另一个函数的参数。函数的类型是 fn （使用小写的 “f” ）以免与 Fn 闭包 trait 相混淆。fn 被称为 函数指针（function pointer）。指定参数为函数指针的语法类似于闭包，
+
+```rust
+fn add_one(x: i32) -> i32 {
+    x + 1
+}
+
+fn do_twice(f: fn(i32) -> i32, arg: i32) -> i32 {
+    f(arg) + f(arg)
+}
+
+fn main() {
+    let answer = do_twice(add_one, 5);
+
+    println!("The answer is: {}", answer);
+}
+
+```
+
+这会打印出 The answer is: 12。do_twice 中的 f 被指定为一个接受一个 i32 参数并返回 i32 的 fn。接着就可以在 do_twice 函数体中调用 f。在 main 中，可以将函数名 add_one 作为第一个参数传递给 do_twice。
+
+不同于闭包，fn 是一个类型而不是一个 trait，所以直接指定 fn 作为参数而不是声明一个带有 Fn 作为 trait bound 的泛型参数。
+
+函数指针实现了所有三个闭包 trait（Fn、FnMut 和 FnOnce），所以总是可以在调用期望闭包的函数时传递函数指针作为参数。倾向于编写使用泛型和闭包 trait 的函数，这样它就能接受函数或闭包作为参数。
+
+一个只期望接受 fn 而不接受闭包的情况的例子是与不存在闭包的外部代码交互时：C 语言的函数可以接受函数作为参数，但 C 语言没有闭包。
+
+作为一个既可以使用内联定义的闭包又可以使用命名函数的例子，看看一个 map 的应用。使用 map 函数将一个数字 vector 转换为一个字符串 vector，就可以使用闭包，比如这样：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let list_of_numbers = vec![1, 2, 3];
+let list_of_strings: Vec<String> = list_of_numbers
+    .iter()
+    .map(|i| i.to_string())
+    .collect();
+}
+```
+
+或者可以将函数作为 map 的参数来代替闭包，像是这样：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let list_of_numbers = vec![1, 2, 3];
+let list_of_strings: Vec<String> = list_of_numbers
+    .iter()
+    .map(ToString::to_string)
+    .collect();
+}
+```
+
+注意这里必须使用 “高级 trait” 部分讲到的完全限定语法，因为存在多个叫做 to_string 的函数；这里使用了定义于 ToString trait 的 to_string 函数，标准库为所有实现了 Display 的类型实现了这个 trait。
+
+另一个实用的模式暴露了元组结构体和元组结构体枚举成员的实现细节。这些项使用 () 作为初始化语法，这看起来就像函数调用，同时它们确实被实现为返回由参数构造的实例的函数。它们也被称为实现了闭包 trait 的函数指针，并可以采用类似如下的方式调用：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+enum Status {
+    Value(u32),
+    Stop,
+}
+
+let list_of_statuses: Vec<Status> =
+    (0u32..20)
+    .map(Status::Value)
+    .collect();
+}
+```
+
+这里创建了 Status::Value 实例，它通过 map 用范围的每一个 u32 值调用 Status::Value 的初始化函数。一些人倾向于函数风格，一些人喜欢闭包。
+
+#### 返回闭包
+
+闭包表现为 trait，这意味着不能直接返回闭包。对于大部分需要返回 trait 的情况，可以使用实现了期望返回的 trait 的具体类型来替代函数的返回值。但是这不能用于闭包，因为他们没有一个可返回的具体类型；例如不允许使用函数指针 fn 作为返回值类型。
+
+Rust 并不知道需要多少空间来储存闭包。不过在上一部分见过这种情况的解决办法：可以使用 trait 对象：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+fn returns_closure() -> Box<dyn Fn(i32) -> i32> {
+    Box::new(|x| x + 1)
+}
+}
+```
+
+#### 宏
+
+已经使用过像 println! 这样的宏了，不过还没完全探索什么是宏以及它是如何工作的。宏（Macro）指的是 Rust 中一系列的功能：声明（Declarative）宏，使用 macro_rules!，和三种 过程（Procedural）宏：
+
+* 自定义 `#[derive]` 宏在结构体和枚举上指定通过 derive 属性添加的代码
+* 类属性（Attribute）宏定义可用于任意项的自定义属性
+* 类函数宏看起来像函数不过作用于作为参数传递的 token。
+
+#### 宏和函数的区别
+
+从根本上来说，宏是一种为写其他代码而写代码的方式，即所谓的 元编程（metaprogramming）。在附录 C 中会探讨 derive 属性，其生成各种 trait 的实现。也在本书中使用过 println! 宏和 vec! 宏。所有的这些宏以 展开 的方式来生成比你所手写出的更多的代码。
+
+元编程对于减少大量编写和维护的代码是非常有用的，它也扮演了函数的角色。但宏有一些函数所没有的附加能力。
+
+一个函数标签必须声明函数参数个数和类型。相比之下，宏只接受一个可变参数：用一个参数调用 println!("hello") 或用两个参数调用 println!("hello {}", name) 。而且，宏可以在编译器翻译代码前展开，例如，宏可以在一个给定类型上实现 trait 。因为函数是在运行时被调用，同时 trait 需要在运行时实现，所以函数无法像宏这样。
+
+实现一个宏而不是函数的消极面是宏定义要比函数定义更复杂，因为你正在编写生成 Rust 代码的 Rust 代码。由于这样的间接性，宏定义通常要比函数定义更难阅读、理解以及维护。
+
+宏和函数的最后一个重要的区别是：在调用宏 之前 必须定义并将其引入作用域，而函数则可以在任何地方定义和调用。
+
+#### 使用 macro_rules! 的声明宏用于通用元编程
+
+Rust 最常用的宏形式是 声明宏（declarative macros）。它们有时也被称为 “macros by example”、“macro_rules! 宏” 或者就是 “macros”。其核心概念是，声明宏允许编写一些类似 Rust match 表达式的代码。正如在第六章讨论的那样，match 表达式是控制结构，其接收一个表达式，与表达式的结果进行模式匹配，然后根据模式匹配执行相关代码。宏也将一个值和包含相关代码的模式进行比较；此种情况下，该值是传递给宏的 Rust 源代码字面值，模式用于和传递给宏的源代码进行比较，同时每个模式的相关代码则用于替换传递给宏的代码。所有这一切都发生于编译时。
+
+可以使用 macro_rules! 来定义宏。通过查看 vec! 宏定义来探索如何使用 macro_rules! 结构。第八章讲述了如何使用 vec! 宏来生成一个给定值的 vector。例如，下面的宏用三个整数创建一个 vector：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+let v: Vec<u32> = vec![1, 2, 3];
+}
+```
+
+也可以使用 vec! 宏来构造两个整数的 vector 或五个字符串 slice 的 vector 。但却无法使用函数做相同的事情，因为无法预先知道参数值的数量和类型。
+
+下例中展示了一个 vec! 稍微简化的定义。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+#[macro_export]
+macro_rules! vec {
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            temp_vec
+        }
+    };
+}
+}
+```
+
+*注意：标准库中实际定义的 vec! 包括预分配适当量的内存的代码。这部分为代码优化，为了让示例简化，此处并没有包含在内。*
+
+无论何时导入定义了宏的包，`#[macro_export]` 注解说明宏应该是可用的。 如果没有该注解，这个宏不能被引入作用域。
+
+接着使用 macro_rules! 和宏名称开始宏定义，且所定义的宏并 不带 感叹号。名字后跟大括号表示宏定义体，在该例中宏名称是 vec 。
+
+vec! 宏的结构和 match 表达式的结构类似。此处有一个单边模式 ( $( $x:expr ),* ) ，后跟 => 以及和模式相关的代码块。如果模式匹配，该相关代码块将被执行。假设这是这个宏中唯一的模式，则只有这一种有效匹配，其他任何匹配都是错误的。更复杂的宏会有多个单边模式。
+
+宏定义中有效模式语法和在第十八章提及的模式语法是不同的，因为宏模式所匹配的是 Rust 代码结构而不是值。
+
+首先，一对括号包含了全部模式。接下来是后跟一对括号的美元符号（ $ ），其通过替代代码捕获了符合括号内模式的值。$() 内则是 $x:expr ，其匹配 Rust 的任意表达式或给定 $x 名字的表达式。
+
+$() 之后的逗号说明一个逗号分隔符可以有选择的出现代码之后，这段代码与在 $() 中所捕获的代码相匹配。紧随逗号之后的 * 说明该模式匹配零个或多个 * 之前的任何模式。
+
+当以 vec![1, 2, 3]; 调用宏时，$x 模式与三个表达式 1、2 和 3 进行了三次匹配。
+
+现在来看看这个出现在与此单边模式相关的代码块中的模式：在 `$()*` 部分中所生成的 temp_vec.push() 为在匹配到模式中的 `$()` 每一部分而生成。`$x` 由每个与之相匹配的表达式所替换。当以 vec![1, 2, 3]; 调用该宏时，替换该宏调用所生成的代码会是下面这样：
+
+```rust
+let mut temp_vec = Vec::new();
+temp_vec.push(1);
+temp_vec.push(2);
+temp_vec.push(3);
+temp_vec
+
+```
+
+已经定义了一个宏，其可以接收任意数量和类型的参数，同时可以生成能够创建包含指定元素的 vector 的代码。
+
+macro_rules! 中有一些奇怪的地方。在将来，会有第二种采用 macro 关键字的声明宏，其工作方式类似但修复了这些极端情况。在此之后，macro_rules! 实际上就过时（deprecated）了。在此基础之上，同时鉴于大多数 Rust 程序员 使用 宏而非 编写 宏的事实，此处不再深入探讨 macro_rules!。
+
+#### 用于从属性生成代码的过程宏
+
+第二种形式的宏被称为 过程宏（procedural macros），因为它们更像函数（一种过程类型）。过程宏接收 Rust 代码作为输入，在这些代码上进行操作，然后产生另一些代码作为输出，而非像声明式宏那样匹配对应模式然后以另一部分代码替换当前代码。
+
+有三种类型的过程宏（自定义 derive，类属性和类函数），不过它们的工作方式都类似。
+
+当创建过程宏时，其定义必须位于一种特殊类型的属于它们自己的 crate 中。这么做出于复杂的技术原因，将来希望能够消除这些限制。使用这些宏需采用类似示例 19-29 所示的代码形式，其中 some_attribute 是一个使用特定宏的占位符。
+
+```rust
+use proc_macro;
+
+#[some_attribute]
+pub fn some_name(input: TokenStream) -> TokenStream {
+}
+
+```
+
+过程宏包含一个函数，这也是其得名的原因：“过程” 是 “函数” 的同义词。那么为何不叫 “函数宏” 呢？好吧，有一个过程宏是 “类函数” 的，叫成函数会产生混乱。无论如何，定义过程宏的函数接受一个 TokenStream 作为输入并产生一个 TokenStream 作为输出。这也就是宏的核心：宏所处理的源代码组成了输入 TokenStream，同时宏生成的代码是输出 TokenStream。最后，函数上有一个属性；这个属性表明过程宏的类型。在同一 crate 中可以有多种的过程宏。
+
+考虑到这些宏是如此类似，会从自定义派生宏开始。接着会解释与其他形式宏的微小区别。
+
+#### 如何编写自定义 derive 宏
+
+创建一个 hello_macro crate，其包含名为 HelloMacro 的 trait 和关联函数 hello_macro。不同于让 crate 的用户为其每一个类型实现 HelloMacro trait，将会提供一个过程式宏以便用户可以使用 `#[derive(HelloMacro)]` 注解他们的类型来得到 hello_macro 函数的默认实现。该默认实现会打印 Hello, Macro! My name is TypeName!，其中 TypeName 为定义了 trait 的类型名。
+
+```rust
+use hello_macro::HelloMacro;
+use hello_macro_derive::HelloMacro;
+
+#[derive(HelloMacro)]
+struct Pancakes;
+
+fn main() {
+    Pancakes::hello_macro();
+}
+
+```
+
+现在有了一个包含函数的 trait 。此时，crate 用户可以实现该 trait 以达到其期望的功能，像这样：
+
+```rust
+use hello_macro::HelloMacro;
+
+struct Pancakes;
+
+impl HelloMacro for Pancakes {
+    fn hello_macro() {
+        println!("Hello, Macro! My name is Pancakes!");
+    }
+}
+
+fn main() {
+    Pancakes::hello_macro();
+}
+
+```
+
+```rust
+extern crate proc_macro;
+
+use crate::proc_macro::TokenStream;
+use quote::quote;
+use syn;
+
+#[proc_macro_derive(HelloMacro)]
+pub fn hello_macro_derive(input: TokenStream) -> TokenStream {
+    // 构建 Rust 代码所代表的语法树
+    // 以便可以进行操作
+    let ast = syn::parse(input).unwrap();
+
+    // 构建 trait 实现
+    impl_hello_macro(&ast)
+}
+
+```
+
+注意 hello_macro_derive 函数中代码分割的方式，它负责解析 TokenStream，而 impl_hello_macro 函数则负责转换语法树：这让编写一个过程式宏更加方便。外部函数中的代码（在这里是 hello_macro_derive）几乎在所有你能看到或创建的过程宏 crate 中都一样。内部函数（在这里是 impl_hello_macro）的函数体中所指定的代码则依过程宏的目的而各有不同。
+
+现在，已经引入了三个新的 crate：proc_macro 、 syn 和 quote 。Rust 自带 proc_macro crate，因此无需将其加到 Cargo.toml 文件的依赖中。proc_macro crate 是编译器用来读取和操作 Rust 代码的 API。
+
+syn crate 将字符串中的 Rust 代码解析成为一个可以操作的数据结构。quote 则将 syn 解析的数据结构反过来传入到 Rust 代码中。这些 crate 让解析任何所要处理的 Rust 代码变得更简单：为 Rust 编写整个的解析器并不是一件简单的工作。
+
+当用户在一个类型上指定 `#[derive(HelloMacro)]` 时，hello_macro_derive 函数将会被调用。原因在于已经使用 proc_macro_derive 及其指定名称对 hello_macro_derive 函数进行了注解：HelloMacro ，其匹配到 trait 名，这是大多数过程宏遵循的习惯。
+
+该函数首先将来自 TokenStream 的 input 转换为一个可以解释和操作的数据结构。这正是 syn 派上用场的地方。syn 中的 parse_derive_input 函数获取一个 TokenStream 并返回一个表示解析出 Rust 代码的 DeriveInput 结构体。示例 19-32 展示了从字符串 struct Pancakes; 中解析出来的 DeriveInput 结构体的相关部分：
+
+```rust
+DeriveInput {
+    // --snip--
+
+    ident: Ident {
+        ident: "Pancakes",
+        span: #0 bytes(95..103)
+    },
+    data: Struct(
+        DataStruct {
+            struct_token: Struct,
+            fields: Unit,
+            semi_token: Some(
+                Semi
+            )
+        }
+    )
+}
+
+```
+
+该结构体的字段展示了解析的 Rust 代码是一个类单元结构体，其 ident（ identifier，表示名字）为 Pancakes。该结构体里面有更多字段描述了所有类型的 Rust 代码，查阅 syn 中 DeriveInput 的文档 以获取更多信息。
+
+此时，尚未定义 impl_hello_macro 函数，其用于构建所要包含在内的 Rust 新代码。但在此之前，注意其输出也是 TokenStream。所返回的 TokenStream 会被加到的 crate 用户所写的代码中，因此，当用户编译他们的 crate 时，他们会获取到所提供的额外功能。
+
+你可能也注意到了，当调用 parse_derive_input 或 parse 失败时。在错误时 panic 对过程宏来说是必须的，因为 proc_macro_derive 函数必须返回 TokenStream 而不是 Result，以此来符合过程宏的 API。这里选择用 unwrap 来简化了这个例子；在生产代码中，则应该通过 panic! 或 expect 来提供关于发生何种错误的更加明确的错误信息。
+
+现在有了将注解的 Rust 代码从 TokenStream 转换为 DeriveInput 实例的代码，来创建在注解类型上实现 HelloMacro trait 的代码，如下例  所示。
+
+```rust
+fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        impl HelloMacro for #name {
+            fn hello_macro() {
+                println!("Hello, Macro! My name is {}", stringify!(#name));
+            }
+        }
+    };
+    gen.into()
+}
+
+```
+
+#### 类属性宏
+
+类属性宏与自定义派生宏相似，不同于为 derive 属性生成代码，它们允许你创建新的属性。它们也更为灵活；derive 只能用于结构体和枚举；属性还可以用于其它的项，比如函数。作为一个使用类属性宏的例子，可以创建一个名为 route 的属性用于注解 web 应用程序框架（web application framework）的函数：
+
+```rust
+#[route(GET, "/")]
+fn index() {
+}
+```
+
+`#[route]` 属性将由框架本身定义为一个过程宏。其宏定义的函数签名看起来像这样：
+
+```rust
+#[proc_macro_attribute]
+pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
+
+```
+
+这里有两个 TokenStream 类型的参数；第一个用于属性内容本身，也就是 GET, "/" 部分。第二个是属性所标记的项，在本例中，是 fn index() {} 和剩下的函数体。
+
+除此之外，类属性宏与自定义派生宏工作方式一致：创建 proc-macro crate 类型的 crate 并实现希望生成代码的函数！
+
+#### 类函数宏
+
+类函数宏定义看起来像函数调用的宏。类似于 macro_rules!，它们比函数更灵活；例如，可以接受未知数量的参数。然而 macro_rules! 宏只能使用之前 “使用 macro_rules! 的声明宏用于通用元编程” 介绍的类匹配的语法定义。类函数宏获取 TokenStream 参数，其定义使用 Rust 代码操纵 TokenStream，就像另两种过程宏一样。一个类函数宏例子是可以像这样被调用的 sql! 宏：
+
+```rust
+let sql = sql!(SELECT * FROM posts WHERE id=1);
+
+```
+
+这个宏会解析其中的 SQL 语句并检查其是否是句法正确的，这是比 macro_rules! 可以做到的更为复杂的处理。sql! 宏应该被定义为如此：
+
+```rust
+#[proc_macro]
+pub fn sql(input: TokenStream) -> TokenStream {
+
+```
+
+这类似于自定义派生宏的签名：获取括号中的 token，并返回希望生成的代码。
+
+### Rust应用实例：多线程web server
+
+如下是将怎样构建此 web server 的计划：
+
+* 学习一些 TCP 与 HTTP 知识
+* 在套接字（socket）上监听 TCP 请求
+* 解析少量的 HTTP 请求
+* 创建一个合适的 HTTP 响应
+* 通过线程池改善 server 的吞吐量
+
+这里使用的方法并不是使用 Rust 构建 web server 最好的方法。crates.io 上有很多可用于生产环境的 crate，它们提供了比所要编写的更为完整的 web server 和线程池实现。
+
+#### 构建单线程 web server
+
+首先创建一个可运行的单线程 web server，不过在开始之前，将快速了解一下构建 web server 所涉及到的协议。
+
+web server 中涉及到的两个主要协议是 超文本传输协议（Hypertext Transfer Protocol，HTTP）和 传输控制协议（Transmission Control Protocol，TCP）。这两者都是 请求-响应（request-response）协议，也就是说，有 客户端（client）来初始化请求，并有 服务端（server）监听请求并向客户端提供响应。请求与响应的内容由协议本身定义。
+
+TCP 是一个底层协议，它描述了信息如何从一个 server 到另一个的细节，不过其并不指定信息是什么。HTTP 构建于 TCP 之上，它定义了请求和响应的内容。为此，技术上讲可将 HTTP 用于其他协议之上，不过对于绝大部分情况，HTTP 通过 TCP 传输。将要做的就是处理 TCP 和 HTTP 请求与响应的原始字节数据。
+
+#### 监听 TCP 连接
+
+所以 web server 所需做的第一件事便是能够监听 TCP 连接。标准库提供了 std::net 模块处理这些功能。
+
+```rust
+use std::net::TcpListener;
+
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+
+    for stream in listener.incoming() {
+        let stream = stream.unwrap();
+
+        println!("Connection established!");
+    }
+}
+
+```
+
+TcpListener 用于监听 TCP 连接。选择监听地址 127.0.0.1:7878。将这个地址拆开，冒号之前的部分是一个代表本机的 IP 地址（这个地址在每台计算机上都相同，并不特指作者的计算机），而 7878 是端口。选择这个端口出于两个原因：通常 HTTP 接受这个端口而且 7878 在电话上打出来就是 "rust"
+
+在这个场景中 bind 函数类似于 new 函数，在这里它返回一个新的 TcpListener 实例。这个函数叫做 bind 是因为，在网络领域，连接到监听端口被称为 “绑定到一个端口”（“binding to a port”）
+
+bind 函数返回 `Result<T, E>`，这表明绑定可能会失败，例如，连接 80 端口需要管理员权限（非管理员用户只能监听大于 1024 的端口），所以如果不是管理员尝试连接 80 端口，则会绑定失败。另一个例子是如果运行两个此程序的实例这样会有两个程序监听相同的端口，绑定会失败。因为是出于学习目的来编写一个基础的 server，将不用关心处理这类错误，使用 unwrap 在出现这些情况时直接停止程序。
+
+TcpListener 的 incoming 方法返回一个迭代器，它提供了一系列的流（更准确的说是 TcpStream 类型的流）。流（stream）代表一个客户端和服务端之间打开的连接。连接（connection）代表客户端连接服务端、服务端生成响应以及服务端关闭连接的全部请求 / 响应过程。为此，TcpStream 允许读取它来查看客户端发送了什么，并可以编写响应。总体来说，这个 for 循环会依次处理每个连接并产生一系列的流供处理。
+
+目前为止，处理流的过程包含 unwrap 调用，如果出现任何错误会终止程序，如果没有任何错误，则打印出信息。下一个示例将为成功的情况增加更多功能。当客户端连接到服务端时 incoming 方法返回错误是可能的，因为实际上没有遍历连接，而是遍历 连接尝试（connection attempts）。连接可能会因为很多原因不能成功，大部分是操作系统相关的。例如，很多系统限制同时打开的连接数；新连接尝试产生错误，直到一些打开的连接关闭为止。
+
+试试这段代码！首先在终端执行 cargo run，接着在浏览器中加载 127.0.0.1:7878。浏览器会显示出看起来类似于“连接重置”（“Connection reset”）的错误信息，因为 server 目前并没响应任何数据。
+
+有时会看到对于一次浏览器请求会打印出多条信息；这可能是因为浏览器在请求页面的同时还请求了其他资源，比如出现在浏览器 tab 标签中的 favicon.ico。
+
+这也可能是因为浏览器尝试多次连接 server，因为 server 没有响应任何数据。当 stream 在循环的结尾离开作用域并被丢弃，其连接将被关闭，作为 drop 实现的一部分。浏览器有时通过重连来处理关闭的连接，因为这些问题可能是暂时的。现在重要的是成功的处理了 TCP 连接！
+
+记得当运行完特定版本的代码后使用 ctrl-C 来停止程序。并在做出最新的代码修改之后执行 cargo run 重启服务。
+
+#### 读取请求
+
+为了分离获取连接和接下来对连接的操作的相关内容，将开始一个新函数来处理连接。在这个新的 handle_connection 函数中，从 TCP 流中读取数据并打印出来以便观察浏览器发送过来的数据。
+
+```rust
+use std::io::prelude::*;
+use std::net::TcpStream;
+use std::net::TcpListener;
+
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+
+    for stream in listener.incoming() {
+        let stream = stream.unwrap();
+
+        handle_connection(stream);
+    }
+}
+
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 512];
+
+    stream.read(&mut buffer).unwrap();
+
+    println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+}
+
+```
+
+这里将 std::io::prelude 引入作用域来获取读写流所需的特定 trait。在 main 函数的 for 循环中，相比获取到连接时打印信息，现在调用新的 handle_connection 函数并向其传递 stream。
+
+在 handle_connection 中，stream 参数是可变的。这是因为 TcpStream 实例在内部记录了所返回的数据。它可能读取了多于请求的数据并保存它们以备下一次请求数据。因此它需要是 mut 的因为其内部状态可能会改变；通常认为 “读取” 不需要可变性，不过在这个例子中则需要 mut 关键字。
+
+接下来，需要实际读取流。这里分两步进行：首先，在栈上声明一个 buffer 来存放读取到的数据。这里创建了一个 512 字节的缓冲区，它足以存放基本请求的数据并满足本章的目的需要。如果希望处理任意大小的请求，缓冲区管理将更为复杂，不过现在一切从简。接着将缓冲区传递给 stream.read ，它会从 TcpStream 中读取字节并放入缓冲区中。
+
+接下来将缓冲区中的字节转换为字符串并打印出来。String::from_utf8_lossy 函数获取一个 `&[u8]` 并产生一个 String。函数名的 “lossy” 部分来源于当其遇到无效的 UTF-8 序列时的行为：它使用 �，U+FFFD REPLACEMENT CHARACTER，来代替无效序列。你可能会在缓冲区的剩余部分看到这些替代字符，因为他们没有被请求数据填满。
+
+根据使用的浏览器不同可能会出现稍微不同的数据。现在打印出了请求数据，可以通过观察 Request: GET 之后的路径来解释为何会从浏览器得到多个连接。如果重复的连接都是请求 /，就知道了浏览器尝试重复获取 / 因为它没有从程序得到响应。
+
+#### HTTP 请求的构成
+
+HTTP 是一个基于文本的协议，同时一个请求有如下格式：
+
+```
+Method Request-URI HTTP-Version CRLF
+headers CRLF
+message-body
+
+```
+
+第一行叫做 请求行（request line），它存放了客户端请求了什么的信息。请求行的第一部分是所使用的 method，比如 GET 或 POST，这描述了客户端如何进行请求。这里客户端使用了 GET 请求。
+
+请求行接下来的部分是 /，它代表客户端请求的 统一资源标识符（Uniform Resource Identifier，URI） —— URI 大体上类似，但也不完全类似于 URL（统一资源定位符，Uniform Resource Locators）。URI 和 URL 之间的区别对于本章的目的来说并不重要，不过 HTTP 规范使用术语 URI，所以这里可以简单的将 URL 理解为 URI。
+
+最后一部分是客户端使用的HTTP版本，然后请求行以 CRLF序列 （CRLF代表回车和换行，carriage return line feed，这是打字机时代的术语！）结束。CRLF序列也可以写成\r\n，其中\r是回车符，\n是换行符。 CRLF序列将请求行与其余请求数据分开。 请注意，打印CRLF时，会看到一个新行，而不是\r\n。
+
+观察目前运行程序所接收到的数据的请求行，可以看到 GET 是 method，/ 是请求 URI，而 HTTP/1.1 是版本。
+
+从 Host: 开始的其余的行是 headers；GET 请求没有 body。
+
+如果希望的话，尝试用不同的浏览器发送请求，或请求不同的地址，比如 127.0.0.1:7878/test，来观察请求数据如何变化。
+
+#### 编写响应
+
+将实现在客户端请求的响应中发送数据的功能。响应有如下格式：
+
+```rust
+HTTP-Version Status-Code Reason-Phrase CRLF
+headers CRLF
+message-body
+
+```
+
+第一行叫做 状态行（status line），它包含响应的 HTTP 版本、一个数字状态码用以总结请求的结果和一个描述之前状态码的文本原因短语。CRLF 序列之后是任意 header，另一个 CRLF 序列，和响应的 body。
+
+这里是一个使用 HTTP 1.1 版本的响应例子，其状态码为 200，原因短语为 OK，没有 header，也没有 body：
+
+```http
+HTTP/1.1 200 OK\r\n\r\n
+
+```
+
+状态码 200 是一个标准的成功响应。这些文本是一个微型的成功 HTTP 响应。将这些文本写入流作为成功请求的响应！在 handle_connection 函数中，需要去掉打印请求数据的 println!，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io::prelude::*;
+use std::net::TcpStream;
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 512];
+
+    stream.read(&mut buffer).unwrap();
+
+    let response = "HTTP/1.1 200 OK\r\n\r\n";
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
+}
+}
+```
+
+新代码中的第一行定义了变量 response 来存放将要返回的成功响应的数据。接着，在 response 上调用 as_bytes，因为 stream 的 write 方法获取一个 `&[u8]` 并直接将这些字节发送给连接。
+
+因为 write 操作可能会失败，所以像之前那样对任何错误结果使用 unwrap。同理，在真实世界的应用中这里需要添加错误处理。最后，flush 会等待并阻塞程序执行直到所有字节都被写入连接中；TcpStream 包含一个内部缓冲区来最小化对底层操作系统的调用。
+
+有了这些修改，运行的代码并进行请求！不再向终端打印任何数据，所以不会再看到除了 Cargo 以外的任何输出。不过当在浏览器中加载 127.0.0.1:7878 时，会得到一个空页面而不是错误。
+
+#### 返回真正的 HTML
+
+让实现不只是返回空页面的功能。在项目根目录创建一个新文件，hello.html —— 也就是说，不是在 src 目录。在此可以放入任何期望的 HTML；
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello!</title>
+  </head>
+  <body>
+    <h1>Hello!</h1>
+    <p>Hi from Rust</p>
+  </body>
+</html>
+
+```
+
+这是一个极小化的 HTML5 文档，它有一个标题和一小段文本。为了在 server 接受请求时返回它，修改为如下代码：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io::prelude::*;
+use std::net::TcpStream;
+use std::fs;
+// --snip--
+
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
+
+    let contents = fs::read_to_string("hello.html").unwrap();
+
+    let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
+}
+}
+```
+
+在开头增加了一行来将标准库中的 File 引入作用域。打开和读取文件的代码应该看起来很熟悉，因为第十二章 I/O 项目的示例 12-4 中读取文件内容时出现过类似的代码。
+
+接下来，使用 format! 将文件内容加入到将要写入流的成功响应的 body 中。
+
+使用 cargo run 运行程序，在浏览器加载 127.0.0.1:7878，你应该会看到渲染出来的 HTML 文件！
+
+目前忽略了 buffer 中的请求数据并无条件的发送了 HTML 文件的内容。这意味着如果尝试在浏览器中请求 127.0.0.1:7878/something-else 也会得到同样的 HTML 响应。如此其作用是非常有限的，也不是大部分 server 所做的；检查请求并只对格式良好（well-formed）的请求 / 发送 HTML 文件。
+
+#### 验证请求并有选择的进行响应
+
+目前的 web server 不管客户端请求什么都会返回相同的 HTML 文件。增加在返回 HTML 文件前检查浏览器是否请求 /，并在其请求任何其他内容时返回错误的功能。新代码接收到的请求的内容与已知的 / 请求的一部分做比较，并增加了 if 和 else 块来区别处理请求：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io::prelude::*;
+use std::net::TcpStream;
+use std::fs;
+// --snip--
+
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
+
+    let get = b"GET / HTTP/1.1\r\n";
+
+    if buffer.starts_with(get) {
+        let contents = fs::read_to_string("hello.html").unwrap();
+
+        let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
+
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
+    } else {
+        // 其他请求
+    }
+}
+}
+```
+
+首先，将与 / 请求相关的数据硬编码进变量 get。因为将原始字节读取进了缓冲区，所以在 get 的数据开头增加 b"" 字节字符串语法将其转换为字节字符串。接着检查 buffer 是否以 get 中的字节开头。如果是，这就是一个格式良好的 / 请求，也就是 if 块中期望处理的成功情况，并会返回 HTML 文件内容的代码。
+
+如果 buffer 不 以 get 中的字节开头，就说明接收的是其他请求。之后会在 else 块中增加代码来响应所有其他请求。
+
+现在如果运行代码并请求 127.0.0.1:7878，就会得到 hello.html 中的 HTML。如果进行任何其他请求，比如 127.0.0.1:7878/something-else
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io::prelude::*;
+use std::net::TcpStream;
+use std::fs;
+fn handle_connection(mut stream: TcpStream) {
+if true {
+// --snip--
+
+} else {
+    let status_line = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+    let contents = fs::read_to_string("404.html").unwrap();
+
+    let response = format!("{}{}", status_line, contents);
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
+}
+}
+}
+```
+
+这里，响应的状态行有状态码 404 和原因短语 NOT FOUND。仍然没有返回任何 header，而其 body 将是 404.html 文件中的 HTML。需要在 hello.html 同级目录创建 404.html 文件作为错误页面；这一次也可以随意使用任何 HTML 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello!</title>
+  </head>
+  <body>
+    <h1>Oops!</h1>
+    <p>Sorry, I don't know what you're asking for.</p>
+  </body>
+</html>
+
+```
+
+有了这些修改，再次运行 server。请求 127.0.0.1:7878 应该会返回 hello.html 的内容，而对于任何其他请求，比如 127.0.0.1:7878/foo，应该会返回 404.html 中的错误 HTML！
+
+#### 少量代码重构
+
+目前 if 和 else 块中的代码有很多的重复：他们都读取文件并将其内容写入流。唯一的区别是状态行和文件名。为了使代码更为简明，将这些区别分别提取到一行 if 和 else 中，对状态行和文件名变量赋值；然后在读取文件和写入响应的代码中无条件的使用这些变量。重构后取代了大段 if 和 else 块代码
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::io::prelude::*;
+use std::net::TcpStream;
+use std::fs;
+// --snip--
+
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
+
+    let get = b"GET / HTTP/1.1\r\n";
+    // --snip--
+
+    let (status_line, filename) = if buffer.starts_with(get) {
+        ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
+    } else {
+        ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
+    };
+
+    let contents = fs::read_to_string(filename).unwrap();
+
+    let response = format!("{}{}", status_line, contents);
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
+}
+}
+```
+
+现在 if 和 else 块所做的唯一的事就是在一个元组中返回合适的状态行和文件名的值；接着使用模式的 let 语句通过解构元组的两部分为 filename 和 header 赋值。
+
+之前读取文件和写入响应的冗余代码现在位于 if 和 else 块之外，并会使用变量 status_line 和 filename。这样更易于观察这两种情况真正有何不同，还意味着如果需要改变如何读取文件或写入响应时只需要更新一处的代码。示例 20-9 中代码的行为与示例 20-8 完全一样。
+
+好极了！有了一个 40 行左右 Rust 代码的小而简单的 server，它对一个请求返回页面内容而对所有其他请求返回 404 响应。
+
+目前 server 运行于单线程中，它一次只能处理一个请求。模拟一些慢请求来看看这如何会成为一个问题，并进行修复以便 server 可以一次处理多个请求。
+
+#### 将单线程 server 变为多线程 server
+
+目前 server 会依次处理每一个请求，意味着它在完成第一个连接的处理之前不会处理第二个连接。如果 server 正接收越来越多的请求，这类串行操作会使性能越来越差。如果一个请求花费很长时间来处理，随后而来的请求则不得不等待这个长请求结束，即便这些新请求可以很快就处理完。
+
+#### 在当前 server 实现中模拟慢请求
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::thread;
+use std::time::Duration;
+use std::io::prelude::*;
+use std::net::TcpStream;
+use std::fs::File;
+// --snip--
+
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
+    // --snip--
+
+    let get = b"GET / HTTP/1.1\r\n";
+    let sleep = b"GET /sleep HTTP/1.1\r\n";
+
+    let (status_line, filename) = if buffer.starts_with(get) {
+        ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
+    } else if buffer.starts_with(sleep) {
+        thread::sleep(Duration::from_secs(5));
+        ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
+    } else {
+        ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
+    };
+
+    // --snip--
+}
+}
+```
+
+这段代码有些凌乱，不过对于模拟的目的来说已经足够。这里创建了第二个请求 sleep，会识别其数据。在 if 块之后增加了一个 else if 来检查 /sleep 请求，当接收到这个请求时，在渲染成功 HTML 页面之前会先休眠五秒。
+
+现在就可以真切的看出的 server 有多么的原始：真实的库将会以更简洁的方式处理多请求识别问题！
+
+使用 cargo run 启动 server，并接着打开两个浏览器窗口：一个请求 http://127.0.0.1:7878/ 而另一个请求 http://127.0.0.1:7878/sleep 。如果像之前一样多次请求 /，会发现响应的比较快速。不过如果请求 /sleep 之后在请求 /，就会看到 / 会等待直到 sleep 休眠完五秒之后才出现。
+
+这里有多种办法来改变的 web server 使其避免所有请求都排在慢请求之后；将要实现的一个便是线程池。
+
+#### 使用线程池改善吞吐量
+
+**线程池（thread pool）**是一组预先分配的等待或准备处理任务的线程。当程序收到一个新任务，线程池中的一个线程会被分配任务，这个线程会离开并处理任务。其余的线程则可用于处理在第一个线程处理任务的同时处理其他接收到的任务。当第一个线程处理完任务时，它会返回空闲线程池中等待处理新任务。线程池允许并发处理连接，增加 server 的吞吐量。
+
+会将池中线程限制为较少的数量，以防拒绝服务（Denial of Service， DoS）攻击；如果程序为每一个接收的请求都新建一个线程，某人向 server 发起千万级的请求时会耗尽服务器的资源并导致所有请求的处理都被终止。
+
+不同于分配无限的线程，线程池中将有固定数量的等待线程。当新进请求时，将请求发送到线程池中做处理。线程池会维护一个接收请求的队列。每一个线程会从队列中取出一个请求，处理请求，接着向对队列索取另一个请求。通过这种设计，则可以并发处理 N 个请求，其中 N 为线程数。如果每一个线程都在响应慢请求，之后的请求仍然会阻塞队列，不过相比之前增加了能处理的慢请求的数量。
+
+这个设计仅仅是多种改善 web server 吞吐量的方法之一。其他可供探索的方法有 fork/join 模型和单线程异步 I/O 模型。如果你对这个主题感兴趣，则可以阅读更多关于其他解决方案的内容并尝试用 Rust 实现他们；对于一个像 Rust 这样的底层语言，所有这些方法都是可能的。
+
+在开始之前，讨论一下线程池应用看起来怎样。当尝试设计代码时，首先编写客户端接口确实有助于指导代码设计。以期望的调用方式来构建 API 代码的结构，接着在这个结构之内实现功能，而不是先实现功能再设计公有 API。
+
+这里将要使用编译器驱动开发（compiler-driven development）。将编写调用所期望的函数的代码，接着观察编译器错误告诉我们接下来需要修改什么使得代码可以工作。
+
+#### 为每一个请求分配线程的代码结构
+
+为每一个连接都创建一个线程的代码，这并不是最终方案，因为正如之前讲到的它会潜在的分配无限的线程，不过这是一个开始。
+
+```rust
+use std::thread;
+use std::io::prelude::*;
+use std::net::TcpListener;
+use std::net::TcpStream;
+
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+
+    for stream in listener.incoming() {
+        let stream = stream.unwrap();
+
+        thread::spawn(|| {
+            handle_connection(stream);
+        });
+    }
+}
+fn handle_connection(mut stream: TcpStream) {}
+
+```
+
+thread::spawn 会创建一个新线程并在其中运行闭包中的代码。如果运行这段代码并在在浏览器中加载 /sleep，接着在另两个浏览器标签页中加载 /，确实会发现 / 请求不必等待 /sleep 结束。不过正如之前提到的，这最终会使系统崩溃因为我们无限制的创建新线程。
+
+#### 为有限数量的线程创建一个类似的接口
+
+我们期望线程池以类似且熟悉的方式工作，以便从线程切换到线程池并不会对使用该 API 的代码做出较大的修改。
+
+```rust
+use std::thread;
+use std::io::prelude::*;
+use std::net::TcpListener;
+use std::net::TcpStream;
+struct ThreadPool;
+impl ThreadPool {
+   fn new(size: u32) -> ThreadPool { ThreadPool }
+   fn execute<F>(&self, f: F)
+       where F: FnOnce() + Send + 'static {}
+}
+
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+    let pool = ThreadPool::new(4);
+
+    for stream in listener.incoming() {
+        let stream = stream.unwrap();
+
+        pool.execute(|| {
+            handle_connection(stream);
+        });
+    }
+}
+fn handle_connection(mut stream: TcpStream) {}
+
+```
+
+这里使用 ThreadPool::new 来创建一个新的线程池，它有一个可配置的线程数的参数，在这里是四。这样在 for 循环中，pool.execute 有着类似 thread::spawn 的接口，它获取一个线程池运行于每一个流的闭包。pool.execute 需要实现为获取闭包并传递给池中的线程运行。这段代码还不能编译，不过通过尝试编译器会指导我们如何修复它。
+
+#### 采用编译器驱动构建 ThreadPool 结构体
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct ThreadPool;
+
+impl ThreadPool {
+    pub fn new(size: usize) -> ThreadPool {
+        ThreadPool
+    }
+}
+}
+```
+
+会在 ThreadPool 上定义 execute 函数来获取一个闭包参数。回忆第十三章的 “使用带有泛型和 Fn trait 的闭包” 部分，闭包作为参数时可以使用三个不同的 trait：Fn、FnMut 和 FnOnce。我们需要决定这里应该使用哪种闭包。最终需要实现的类似于标准库的 thread::spawn，所以我们可以观察 thread::spawn 的签名在其参数中使用了何种 bound。查看文档会发现：
+
+```rust
+pub fn spawn<F, T>(f: F) -> JoinHandle<T>
+    where
+        F: FnOnce() -> T + Send + 'static,
+        T: Send + 'static
+
+```
+
+F 是这里我们关心的参数；T 与返回值有关所以我们并不关心。考虑到 spawn 使用 FnOnce 作为 F 的 trait bound，这可能也是我们需要的，因为最终会将传递给 execute 的参数传给 spawn。因为处理请求的线程只会执行闭包一次，这也进一步确认了 FnOnce 是我们需要的 trait，这里符合 FnOnce 中 Once 的意思。
+
+F 还有 trait bound Send 和生命周期绑定 'static，这对我们的情况也是有意义的：需要 Send 来将闭包从一个线程转移到另一个线程，而 'static 是因为并不知道线程会执行多久。让我们编写一个使用带有这些 bound 的泛型参数 F 的 ThreadPool 的 execute 方法：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct ThreadPool;
+impl ThreadPool {
+    // --snip--
+
+    pub fn execute<F>(&self, f: F)
+        where
+            F: FnOnce() + Send + 'static
+    {
+
+    }
+}
+}
+```
+
+FnOnce trait 仍然需要之后的 ()，因为这里的 FnOnce 代表一个没有参数也没有返回值的闭包。正如函数的定义，返回值类型可以从签名中省略，不过即便没有参数也需要括号。
+
+#### 在 new 中验证池中线程数量
+
+这里仍然存在警告是因为其并没有对 new 和 execute 的参数做任何操作。让我们用期望的行为来实现这些函数。以考虑 new 作为开始。之前选择使用无符号类型作为 size 参数的类型，因为线程数为负的线程池没有意义。然而，线程数为零的线程池同样没有意义，不过零是一个完全有效的 u32 值。让我们增加在返回 ThreadPool 实例之前检查 size 是否大于零的代码，并使用 assert! 宏在得到零时 panic，如下例  所示：
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+pub struct ThreadPool;
+impl ThreadPool {
+    /// 创建线程池。
+    ///
+    /// 线程池中线程的数量。
+    ///
+    /// # Panics
+    ///
+    /// `new` 函数在 size 为 0 时会 panic。
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        ThreadPool
+    }
+
+    // --snip--
+}
+}
+```
+
+这里用文档注释为 ThreadPool 增加了一些文档。注意这里遵循了良好的文档实践并增加了一个部分来提示函数会 panic 的情况，正如第十四章所讨论的。尝试运行 cargo doc --open 并点击 ThreadPool 结构体来查看生成的 new 的文档看起来如何！
+
+相比像这里使用 assert! 宏，也可以让 new 像之前 I/O 项目中 Config::new 那样返回一个 Result，不过在这里我们选择创建一个没有任何线程的线程池应该是不可恢复的错误。如果你想做的更好，尝试编写一个采用如下签名的 new 版本来感受一下两者的区别：
+
+```rust
+pub fn new(size: usize) -> Result<ThreadPool, PoolCreationError> {
+
+```
+
+#### 分配空间以储存线程
+
+现在有了一个有效的线程池线程数，就可以实际创建这些线程并在返回之前将他们储存在 ThreadPool 结构体中。再看看 thread::spawn 的签名：
+
+```rust
+pub fn spawn<F, T>(f: F) -> JoinHandle<T>
+    where
+        F: FnOnce() -> T + Send + 'static,
+        T: Send + 'static
+
+```
+
+spawn 返回 `JoinHandle<T>`，其中 T 是闭包返回的类型。尝试使用 JoinHandle 来看看会发生什么。在我们的情况中，传递给线程池的闭包会处理连接并不返回任何值，所以 T 将会是单元类型 ()。
+
+不过实际上还并没有创建任何线程。我们改变了 ThreadPool 的定义来存放一个 thread::JoinHandle<()> 的 vector 实例，使用 size 容量来初始化，并设置一个 for 循环了来运行创建线程的代码，并返回包含这些线程的 ThreadPool 实例：
+
+```rust
+use std::thread;
+
+pub struct ThreadPool {
+    threads: Vec<thread::JoinHandle<()>>,
+}
+
+impl ThreadPool {
+    // --snip--
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        let mut threads = Vec::with_capacity(size);
+
+        for _ in 0..size {
+            // create some threads and store them in the vector
+        }
+
+        ThreadPool {
+            threads
+        }
+    }
+
+    // --snip--
+}
+
+```
+
+这里将 std::thread 引入库 crate 的作用域，因为使用了 thread::JoinHandle 作为 ThreadPool 中 vector 元素的类型。
+
+在得到了有效的数量之后，ThreadPool 新建一个存放 size 个元素的 vector。本书还未使用过 with_capacity，它与 Vec::new 做了同样的工作，不过有一个重要的区别：它为 vector 预先分配空间。因为已经知道了 vector 中需要 size 个元素，预先进行分配比仅仅 Vec::new 要稍微有效率一些，因为 Vec::new 随着插入元素而重新改变大小。
+
+#### Worker 结构体负责从 ThreadPool 中将代码传递给线程
+
+for 循环中留下了一个关于创建线程的注释。如何实际创建线程呢？这是一个难题。标准库提供的创建线程的方法，thread::spawn，它期望获取一些一旦创建线程就应该执行的代码。然而，我们希望开始线程并使其等待稍后传递的代码。标准库的线程实现并没有包含这么做的方法；我们必须自己实现。
+
+我们将要实现的行为是创建线程并稍后发送代码，这会在 ThreadPool 和线程间引入一个新数据类型来管理这种新行为。这个数据结构称为 Worker：这是一个池实现中的常见概念。想象一下在餐馆厨房工作的员工：员工等待来自客户的订单，他们负责接受这些订单并完成它们。
+
+不同于在线程池中储存一个 JoinHandle<()> 实例的 vector，我们会储存 Worker 结构体的实例。每一个 Worker 会储存一个单独的 JoinHandle<()> 实例。接着会在 Worker 上实现一个方法，它会获取需要允许代码的闭包并将其发送给已经运行的线程执行。我们还会赋予每一个 worker id，这样就可以在日志和调试中区别线程池中的不同 worker。
+
+首先，让我们做出如此创建 ThreadPool 时所需的修改。在通过如下方式设置完 Worker 之后，我们会实现向线程发送闭包的代码：
+
+1. 定义 Worker 结构体存放 id 和 JoinHandle<()>
+2. 修改 ThreadPool 存放一个 Worker 实例的 vector
+3. 定义 Worker::new 函数，它获取一个 id 数字并返回一个带有 id 和用空闭包分配的线程的 Worker 实例
+4. 在 ThreadPool::new 中，使用 for 循环计数生成 id，使用这个 id 新建 Worker，并储存进 vector 中
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::thread;
+
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+}
+
+impl ThreadPool {
+    // --snip--
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        let mut workers = Vec::with_capacity(size);
+
+        for id in 0..size {
+            workers.push(Worker::new(id));
+        }
+
+        ThreadPool {
+            workers
+        }
+    }
+    // --snip--
+}
+
+struct Worker {
+    id: usize,
+    thread: thread::JoinHandle<()>,
+}
+
+impl Worker {
+    fn new(id: usize) -> Worker {
+        let thread = thread::spawn(|| {});
+
+        Worker {
+            id,
+            thread,
+        }
+    }
+}
+}
+```
+
+这里将 ThreadPool 中字段名从 threads 改为 workers，因为它现在储存 Worker 而不是 JoinHandle<()>。使用 for 循环中的计数作为 Worker::new 的参数，并将每一个新建的 Worker 储存在叫做 workers 的 vector 中。
+
+Worker 结构体和其 new 函数是私有的，因为外部代码（比如 src/bin/main.rs 中的 server）并不需要知道关于 ThreadPool 中使用 Worker 结构体的实现细节。Worker::new 函数使用 id 参数并储存了使用一个空闭包创建的 JoinHandle<()>。
+
+这段代码能够编译并用指定给 ThreadPool::new 的参数创建储存了一系列的 Worker 实例，不过 仍然 没有处理 execute 中得到的闭包。
+
+#### 用通道向线程发送请求
+
+下一个需要解决的问题是传递给 thread::spawn 的闭包完全没有做任何工作。目前，我们在 execute 方法中获得期望执行的闭包，不过在创建 ThreadPool 的过程中创建每一个 Worker 时需要向 thread::spawn 传递一个闭包。
+
+我们希望刚创建的 Worker 结构体能够从 ThreadPool 的队列中获取需要执行的代码，并发送到线程中执行他们。
+
+通道 —— 一个沟通两个线程的简单手段 —— 对于这个例子来说则是绝佳的。这里通道将充当任务队列的作用，execute 将通过 ThreadPool 向其中线程正在寻找工作的 Worker 实例发送任务。如下是这个计划：
+
+1. ThreadPool 会创建一个通道并充当发送端。
+2. 每个 Worker 将会充当通道的接收端。
+3. 新建一个 Job 结构体来存放用于向通道中发送的闭包。
+4. execute 方法会在通道发送端发出期望执行的任务。
+5. 在线程中，Worker 会遍历通道的接收端并执行任何接收到的任务。
+
+以在 ThreadPool::new 中创建通道并让 ThreadPool 实例充当发送端开始，
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::thread;
+// --snip--
+use std::sync::mpsc;
+
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+    sender: mpsc::Sender<Job>,
+}
+
+struct Job;
+
+impl ThreadPool {
+    // --snip--
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        let (sender, receiver) = mpsc::channel();
+
+        let mut workers = Vec::with_capacity(size);
+
+        for id in 0..size {
+            workers.push(Worker::new(id));
+        }
+
+        ThreadPool {
+            workers,
+            sender,
+        }
+    }
+    // --snip--
+}
+
+struct Worker {
+    id: usize,
+    thread: thread::JoinHandle<()>,
+}
+
+impl Worker {
+    fn new(id: usize) -> Worker {
+        let thread = thread::spawn(|| {});
+
+        Worker {
+            id,
+            thread,
+        }
+    }
+}
+}
+```
+
+在 ThreadPool::new 中，新建了一个通道，并接着让线程池在接收端等待。这段代码能够编译，不过仍有警告。
+
+让我们尝试在线程池创建每个 worker 时将通道的接收端传递给他们。须知我们希望在 worker 所分配的线程中使用通道的接收端，所以将在闭包中引用 receiver 参数。
+
+```rust
+impl ThreadPool {
+    // --snip--
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        let (sender, receiver) = mpsc::channel();
+
+        let mut workers = Vec::with_capacity(size);
+
+        for id in 0..size {
+            workers.push(Worker::new(id, receiver));
+        }
+
+        ThreadPool {
+            workers,
+            sender,
+        }
+    }
+    // --snip--
+}
+
+// --snip--
+
+impl Worker {
+    fn new(id: usize, receiver: mpsc::Receiver<Job>) -> Worker {
+        let thread = thread::spawn(|| {
+            receiver;
+        });
+
+        Worker {
+            id,
+            thread,
+        }
+    }
+}
+
+```
+
+这段代码尝试将 receiver 传递给多个 Worker 实例。这是不行的，：Rust 所提供的通道实现是多 生产者，单 消费者 的。这意味着不能简单的克隆通道的消费端来解决问题。即便可以，那也不是我们希望使用的技术；我们希望通过在所有的 worker 中共享单一 receiver，在线程间分发任务。
+
+为了在多个线程间共享所有权并允许线程修改其值，需要使用 `Arc<Mutex<T>>`。Arc 使得多个 worker 拥有接收端，而 Mutex 则确保一次只有一个 worker 能从接收端得到任务。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::thread;
+use std::sync::mpsc;
+use std::sync::Arc;
+use std::sync::Mutex;
+// --snip--
+
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+    sender: mpsc::Sender<Job>,
+}
+struct Job;
+
+impl ThreadPool {
+    // --snip--
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        let (sender, receiver) = mpsc::channel();
+
+        let receiver = Arc::new(Mutex::new(receiver));
+
+        let mut workers = Vec::with_capacity(size);
+
+        for id in 0..size {
+            workers.push(Worker::new(id, Arc::clone(&receiver)));
+        }
+
+        ThreadPool {
+            workers,
+            sender,
+        }
+    }
+
+    // --snip--
+}
+
+struct Worker {
+    id: usize,
+    thread: thread::JoinHandle<()>,
+}
+
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+        // --snip--
+        let thread = thread::spawn(|| {
+           receiver;
+        });
+
+        Worker {
+            id,
+            thread,
+        }
+    }
+}
+}
+```
+
+在 ThreadPool::new 中，将通道的接收端放入一个 Arc 和一个 Mutex 中。对于每一个新 worker，克隆 Arc 来增加引用计数，如此这些 worker 就可以共享接收端的所有权了。
+
+#### 实现 execute 方法
+
+最后实现 ThreadPool 上的 execute 方法。同时也要修改 Job 结构体：它将不再是结构体，Job 将是一个有着 execute 接收到的闭包类型的 trait 对象的类型别名。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+// --snip--
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+    sender: mpsc::Sender<Job>,
+}
+use std::sync::mpsc;
+struct Worker {}
+
+type Job = Box<dyn FnOnce() + Send + 'static>;
+
+impl ThreadPool {
+    // --snip--
+
+    pub fn execute<F>(&self, f: F)
+        where
+            F: FnOnce() + Send + 'static
+    {
+        let job = Box::new(f);
+
+        self.sender.send(job).unwrap();
+    }
+}
+
+// --snip--
+}
+```
+
+在使用 execute 得到的闭包新建 Job 实例之后，将这些任务从通道的发送端发出。这里调用 send 上的 unwrap，因为发送可能会失败，这可能发生于例如停止了所有线程执行的情况，这意味着接收端停止接收新消息了。不过目前我们无法停止线程执行；只要线程池存在他们就会一直执行。使用 unwrap 是因为我们知道失败不可能发生，即便编译器不这么认为。
+
+不过到此事情还没有结束！在 worker 中，传递给 thread::spawn 的闭包仍然还只是 引用 了通道的接收端。相反我们需要闭包一直循环，向通道的接收端请求任务，并在得到任务时执行他们。
+
+```rust
+// --snip--
+
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+        let thread = thread::spawn(move || {
+            loop {
+                let job = receiver.lock().unwrap().recv().unwrap();
+
+                println!("Worker {} got a job; executing.", id);
+
+                job();
+            }
+        });
+
+        Worker {
+            id,
+            thread,
+        }
+    }
+}
+
+```
+
+首先在 receiver 上调用了 lock 来获取互斥器，接着 unwrap 在出现任何错误时 panic。如果互斥器处于一种叫做 被污染（poisoned）的状态时获取锁可能会失败，这可能发生于其他线程在持有锁时 panic 了且没有释放锁。在这种情况下，调用 unwrap 使其 panic 是正确的行为。请随意将 unwrap 改为包含有意义错误信息的 expect。
+
+如果锁定了互斥器，接着调用 recv 从通道中接收 Job。最后的 unwrap 也绕过了一些错误，这可能发生于持有通道发送端的线程停止的情况，类似于如果接收端关闭时 send 方法如何返回 Err 一样。
+
+调用 recv 会阻塞当前线程，所以如果还没有任务，其会等待直到有可用的任务。`Mutex<T>` 确保一次只有一个 Worker 线程尝试请求任务。
+
+```rust
+// --snip--
+
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+        let thread = thread::spawn(move || {
+            while let Ok(job) = receiver.lock().unwrap().recv() {
+                println!("Worker {} got a job; executing.", id);
+
+                job();
+            }
+        });
+
+        Worker {
+            id,
+            thread,
+        }
+    }
+}
+
+```
+
+这段代码可以编译和运行，但是并不会产生所期望的线程行为：一个慢请求仍然会导致其他请求等待执行。其原因有些微妙：Mutex 结构体没有公有 unlock 方法，因为锁的所有权依赖 lock 方法返回的 `LockResult<MutexGuard<T>>` 中 `MutexGuard<T>` 的生命周期。这允许借用检查器在编译时确保绝不会在没有持有锁的情况下访问由 Mutex 守护的资源，不过如果没有认真的思考 `MutexGuard<T>` 的生命周期的话，也可能会导致比预期更久的持有锁。因为 while 表达式中的值在整个块一直处于作用域中，job() 调用的过程中其仍然持有锁，这意味着其他 worker 不能接收任务。
+
+相反通过使用 loop 并在循环块之内而不是之外获取锁和任务，lock 方法返回的 MutexGuard 在 let job 语句结束之后立刻就被丢弃了。这确保了 recv 调用过程中持有锁，而在 job() 调用前锁就被释放了，这就允许并发处理多个请求了。
+
+#### 优雅停机与清理
+
+上例 中的代码如期通过使用线程池异步的响应请求。这里有一些警告说 workers、id 和 thread 字段没有直接被使用，这提醒了我们并没有清理所有的内容。当使用不那么优雅的 ctrl-c 终止主线程时，所有其他线程也会立刻停止，即便它们正处于处理请求的过程中。
+
+现在我们要为 ThreadPool 实现 Drop trait 对线程池中的每一个线程调用 join，这样这些线程将会执行完他们的请求。接着会为 ThreadPool 实现一个告诉线程他们应该停止接收新请求并结束的方式。为了实践这些代码，修改 server 在优雅停机（graceful shutdown）之前只接受两个请求。
+
+#### 为 ThreadPool 实现 Drop Trait
+
+现在开始为线程池实现 Drop。当线程池被丢弃时，应该 join 所有线程以确保他们完成其操作。
+
+首先遍历线程池中的每个 workers。这里使用了 &mut 因为 self 本身是一个可变引用而且也需要能够修改 worker。对于每一个线程，会打印出说明信息表明此特定 worker 正在关闭，接着在 worker 线程上调用 join。如果 join 调用失败，通过 unwrap 使得 panic 并进行不优雅的关闭。
+
+这告诉我们并不能调用 join，因为只有每一个 worker 的可变借用，而 join 获取其参数的所有权。为了解决这个问题，需要一个方法将 thread 移动出拥有其所有权的 Worker 实例以便 join 可以消费这个线程。示例 17-15 中我们曾见过这么做的方法：如果 Worker 存放的是 `Option<thread::JoinHandle<()>`，就可以在 Option 上调用 take 方法将值从 Some 成员中移动出来而对 None 成员不做处理。换句话说，正在运行的 Worker 的 thread 将是 Some 成员值，而当需要清理 worker 时，将 Some 替换为 None，这样 worker 就没有可以运行的线程了。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::thread;
+struct Worker {
+    id: usize,
+    thread: Option<thread::JoinHandle<()>>,
+}
+}
+```
+
+```rust
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+        // --snip--
+
+        Worker {
+            id,
+            thread: Some(thread),
+        }
+    }
+}
+
+```
+
+```rust
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        for worker in &mut self.workers {
+            println!("Shutting down worker {}", worker.id);
+
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+        }
+    }
+}
+
+```
+
+Option 上的 take 方法会取出 Some 而留下 None。使用 if let 解构 Some 并得到线程，接着在线程上调用 join。如果 worker 的线程已然是 None，就知道此时这个 worker 已经清理了其线程所以无需做任何操作。
+
+#### 向线程发送信号使其停止接收任务
+
+有了所有这些修改，代码就能编译且没有任何警告。不过也有坏消息，这些代码还不能以我们期望的方式运行。问题的关键在于 Worker 中分配的线程所运行的闭包中的逻辑：调用 join 并不会关闭线程，因为他们一直 loop 来寻找任务。如果采用这个实现来尝试丢弃 ThreadPool ，则主线程会永远阻塞在等待第一个线程结束上。
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+struct Job;
+enum Message {
+    NewJob(Job),
+    Terminate,
+}
+}
+```
+
+Message 枚举要么是存放了线程需要运行的 Job 的 NewJob 成员，要么是会导致线程退出循环并终止的 Terminate 成员。
+
+同时需要修改通道来使用 Message 类型值而不是 Job
+
+```rust
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+    sender: mpsc::Sender<Message>,
+}
+
+// --snip--
+
+impl ThreadPool {
+    // --snip--
+
+    pub fn execute<F>(&self, f: F)
+        where
+            F: FnOnce() + Send + 'static
+    {
+        let job = Box::new(f);
+
+        self.sender.send(Message::NewJob(job)).unwrap();
+    }
+}
+
+// --snip--
+
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Message>>>) ->
+        Worker {
+
+        let thread = thread::spawn(move ||{
+            loop {
+                let message = receiver.lock().unwrap().recv().unwrap();
+
+                match message {
+                    Message::NewJob(job) => {
+                        println!("Worker {} got a job; executing.", id);
+
+                        job();
+                    },
+                    Message::Terminate => {
+                        println!("Worker {} was told to terminate.", id);
+
+                        break;
+                    },
+                }
+            }
+        });
+
+        Worker {
+            id,
+            thread: Some(thread),
+        }
+    }
+}
+
+```
+
+为了适用 Message 枚举需要将两个地方的 Job 修改为 Message：ThreadPool 的定义和 Worker::new 的签名。ThreadPool 的 execute 方法需要发送封装进 Message::NewJob 成员的任务。然后，在 Worker::new 中当从通道接收 Message 时，当获取到 NewJob成员会处理任务而收到 Terminate 成员则会退出循环。
+
+通过这些修改，代码再次能够编译并继续按照相同的行为运行。不过还是会得到一个警告，因为并没有创建任何 Terminate 成员的消息。
+
+```rust
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        println!("Sending terminate message to all workers.");
+
+        for _ in &mut self.workers {
+            self.sender.send(Message::Terminate).unwrap();
+        }
+
+        println!("Shutting down all workers.");
+
+        for worker in &mut self.workers {
+            println!("Shutting down worker {}", worker.id);
+
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+        }
+    }
+}
+
+```
+
+为了适用 Message 枚举需要将两个地方的 Job 修改为 Message：ThreadPool 的定义和 Worker::new 的签名。ThreadPool 的 execute 方法需要发送封装进 Message::NewJob 成员的任务。然后，在 Worker::new 中当从通道接收 Message 时，当获取到 NewJob成员会处理任务而收到 Terminate 成员则会退出循环。
+
+```rust
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        println!("Sending terminate message to all workers.");
+
+        for _ in &mut self.workers {
+            self.sender.send(Message::Terminate).unwrap();
+        }
+
+        println!("Shutting down all workers.");
+
+        for worker in &mut self.workers {
+            println!("Shutting down worker {}", worker.id);
+
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+        }
+    }
+}
+
+```
+
+现在遍历了 worker 两次，一次向每个 worker 发送一个 Terminate 消息，一个调用每个 worker 线程上的 join。如果尝试在同一循环中发送消息并立即 join 线程，则无法保证当前迭代的 worker 是从通道收到终止消息的 worker。
+
+为了更好的理解为什么需要两个分开的循环，想象一下只有两个 worker 的场景。如果在一个单独的循环中遍历每个 worker，在第一次迭代中向通道发出终止消息并对第一个 worker 线程调用 join。我们会一直等待第一个 worker 结束，不过它永远也不会结束因为第二个线程接收了终止消息。死锁！
+
+为了避免此情况，首先在一个循环中向通道发出所有的 Terminate 消息，接着在另一个循环中 join 所有的线程。每个 worker 一旦收到终止消息即会停止从通道接收消息，意味着可以确保如果发送同 worker 数相同的终止消息，在 join 之前每个线程都会收到一个终止消息。
+
+```rust
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+    let pool = ThreadPool::new(4);
+
+    for stream in listener.incoming().take(2) {
+        let stream = stream.unwrap();
+
+        pool.execute(|| {
+            handle_connection(stream);
+        });
+    }
+
+    println!("Shutting down.");
+}
+
+```
+
+take 方法定义于 Iterator trait，这里限制循环最多头 2 次。ThreadPool 会在 main 的结尾离开作用域，而且还会看到 drop 实现的运行。
+
+使用 cargo run 启动 server，并发起三个请求。
+
+可能会出现不同顺序的 worker 和信息输出。可以从信息中看到服务是如何运行的： worker 0 和 worker 3 获取了头两个请求，接着在第三个请求时，我们停止接收连接。当 ThreadPool 在 main 的结尾离开作用域时，其 Drop 实现开始工作，线程池通知所有线程终止。每个 worker 在收到终止消息时会打印出一个信息，接着线程池调用 join 来终止每一个 worker 线程。
+
+这个特定的运行过程中一个有趣的地方在于：注意我们向通道中发出终止消息，而在任何线程收到消息之前，就尝试 join worker 0 了。worker 0 还没有收到终止消息，所以主线程阻塞直到 worker 0 结束。与此同时，每一个线程都收到了终止消息。一旦 worker 0 结束，主线程就等待其他 worker 结束，此时他们都已经收到终止消息并能够停止了。
+
+**完整代码**
+
+* main.rs
+
+```rust
+use hello::ThreadPool;
+
+use std::io::prelude::*;
+use std::net::TcpListener;
+use std::net::TcpStream;
+use std::fs;
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+    let pool = ThreadPool::new(4);
+
+    for stream in listener.incoming().take(2) {
+        let stream = stream.unwrap();
+
+        pool.execute(|| {
+            handle_connection(stream);
+        });
+    }
+
+    println!("Shutting down.");
+}
+
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
+
+    let get = b"GET / HTTP/1.1\r\n";
+    let sleep = b"GET /sleep HTTP/1.1\r\n";
+
+    let (status_line, filename) = if buffer.starts_with(get) {
+        ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
+    } else if buffer.starts_with(sleep) {
+        thread::sleep(Duration::from_secs(5));
+        ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
+    } else {
+        ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
+    };
+
+    let contents = fs::read_to_string(filename).unwrap();
+
+    let response = format!("{}{}", status_line, contents);
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
+}
+
+```
+
+* lib.rs
+
+```rust
+
+#![allow(unused_variables)]
+fn main() {
+use std::thread;
+use std::sync::mpsc;
+use std::sync::Arc;
+use std::sync::Mutex;
+
+enum Message {
+    NewJob(Job),
+    Terminate,
+}
+
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+    sender: mpsc::Sender<Message>,
+}
+
+type Job = Box<dyn FnOnce() + Send + 'static>;
+
+impl ThreadPool {
+    /// 创建线程池。
+    ///
+    /// 线程池中线程的数量。
+    ///
+    /// # Panics
+    ///
+    /// `new` 函数在 size 为 0 时会 panic。
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        let (sender, receiver) = mpsc::channel();
+
+        let receiver = Arc::new(Mutex::new(receiver));
+
+        let mut workers = Vec::with_capacity(size);
+
+        for id in 0..size {
+            workers.push(Worker::new(id, Arc::clone(&receiver)));
+        }
+
+        ThreadPool {
+            workers,
+            sender,
+        }
+    }
+
+    pub fn execute<F>(&self, f: F)
+        where
+            F: FnOnce() + Send + 'static
+    {
+        let job = Box::new(f);
+
+        self.sender.send(Message::NewJob(job)).unwrap();
+    }
+}
+
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        println!("Sending terminate message to all workers.");
+
+        for _ in &mut self.workers {
+            self.sender.send(Message::Terminate).unwrap();
+        }
+
+        println!("Shutting down all workers.");
+
+        for worker in &mut self.workers {
+            println!("Shutting down worker {}", worker.id);
+
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+        }
+    }
+}
+
+struct Worker {
+    id: usize,
+    thread: Option<thread::JoinHandle<()>>,
+}
+
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Message>>>) ->
+        Worker {
+
+        let thread = thread::spawn(move ||{
+            loop {
+                let message = receiver.lock().unwrap().recv().unwrap();
+
+                match message {
+                    Message::NewJob(job) => {
+                        println!("Worker {} got a job; executing.", id);
+
+                        job();
+                    },
+                    Message::Terminate => {
+                        println!("Worker {} was told to terminate.", id);
+
+                        break;
+                    },
+                }
+            }
+        });
+
+        Worker {
+            id,
+            thread: Some(thread),
+        }
+    }
+}
+}
+```
+
+这里还有很多可以做的事！如下是一些点子：
+
+* 为 ThreadPool 和其公有方法增加更多文档
+* 为库的功能增加测试
+* 将 unwrap 调用改为更健壮的错误处理
+* 使用 ThreadPool 进行其他不同于处理网络请求的任务
