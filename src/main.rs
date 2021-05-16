@@ -23,5 +23,3 @@ fn main() {
     println!("x = {} and y = {}", x, y);
 
 }
-
-
