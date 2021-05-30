@@ -59,6 +59,30 @@ fn rust_keyword() {
     println!("* yield");
 }
 
+fn rust_identifier() {
+    println!("Rust 中的标识符");
+    let r#async = "1";
+    println!("raw identifier is {}", r#async);
+}
+
+fn rust_variable() {
+    println!("Rust 中的变量");
+    // 不可变变量
+    let x = 1;
+    // 可变变量
+    let mut y = 2;
+    y = 3;
+    println!("immutable var is {}", x);
+    println!("mutable var is {}", y);
+    // 常量
+    let MAX_POINTS: u32 = 100_000;
+    println!("const is {}", MAX_POINTS);
+}
+
+fn rust_datatype() {
+    println!("Rust 中的数据类型");
+}
+
 fn rust_rand() {
     println!("\nHello Rust rand!");
     let secret_number = 1;  // rand::thread_rng().gen_range(1, 101);
@@ -117,6 +141,12 @@ fn main() {
     rust_rand();
     // match keyword
     rust_match();
-    // rust keyword
+    // Rust keyword
     rust_keyword();
+    // Rust idenfier
+    rust_identifier();
+    // Rust variable
+    rust_variable();
+    // Rust data type
+    rust_datatype();
 }
