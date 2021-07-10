@@ -70,13 +70,12 @@ fn rust_variable() {
     // 不可变变量
     let x = 1;
     // 可变变量
-    let mut y = 2;
-    y = 3;
+    let y = 3;
     println!("immutable var is {}", x);
     println!("mutable var is {}", y);
     // 常量
-    let MAX_POINTS: u32 = 100_000;
-    println!("const is {}", MAX_POINTS);
+    let max_points: u32 = 100_000;
+    println!("const is {}", max_points);
 }
 
 fn rust_datatype() {
@@ -91,13 +90,13 @@ fn rust_rand() {
 
 fn rust_match() {
     println!("\nHello Rust match!");
-    let mut number = 2;
-    let mut guess = "1";
-    let deaultVal = 1;
+    let number = 2;
+    let guess = "1";
+    let default_val = 1;
 
     let guess: u32 = match guess.trim().parse() {
         Ok(num) => num,
-        Err(_) => deaultVal,
+        Err(_) => default_val,
     };
 
     match guess.cmp(&number) {
@@ -111,7 +110,7 @@ fn test_trait() {
     println!("hello test trait!");
 }
 
-fn expr() {
+fn rust_expr() {
 
 }
 
@@ -121,8 +120,8 @@ fn main() {
 
     println!("Please input your guess.");
 
-    /* 可变变量 */
-    let mut guess = String::new();
+    /* 可变变量 let mut guess = String::new(); */
+    let guess = String::new();
 
     /* 传变量的引用 */
     // io::stdin().read_line(&mut guess)
@@ -149,4 +148,6 @@ fn main() {
     rust_variable();
     // Rust data type
     rust_datatype();
+    // Rust expression
+    rust_expr();
 }
