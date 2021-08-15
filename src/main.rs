@@ -75,11 +75,53 @@ fn rust_variable() {
     println!("mutable var is {}", y);
     // 常量
     let max_points: u32 = 100_000;
-    println!("const is {}", max_points);
+    println!("const is- {}", max_points);
 }
 
+// rust_datatype print the rust datatype introduction
 fn rust_datatype() {
     println!("Rust 中的数据类型");
+    let u8_var: u8 = 1;
+    let u16_var: u16 = 2;
+    let u32_var: u32 = 3;
+    let u64_var: u64 = 4;
+    let u128_var: u128 = 5;
+    let i8_var: i8 = 1;
+    let i16_var: i16 = 2;
+    let i32_var: i32 = 3;
+    let i64_var: i64 = 4;
+    let i128_var: u128 = 5;
+    let usize_var: usize = 1;
+    let isize_var: isize = 1;
+    let u32_var_from_str: u32 = "42".parse().expect("Not a number");
+    let f32_var: f32 = 1.0;
+    let f64_var: f64 = 1.0;
+    let bool_var: bool = true;
+    let c_var: char = 'a';
+    let str_var: &str = "xx";
+    let tuple_var: (i32, f32) = (1, 1.0);
+    let arr_var: [i32; 4] = [1, 2, 3, 4];
+    let another_arr = [0; 5];  // [0, 0, 0, 0, 0]
+    let v = vec![1, 2, 3];
+    println!("无符号整数类型：u8 u16 u32 u64 u128 {} {} {} {} {}", u8_var, u16_var, u32_var, u64_var, u128_var);
+    println!("有符号整数类型：i8 i16 i32 i64 i128 {} {} {} {} {}", i8_var, i16_var, i32_var, i64_var, i128_var);
+    println!("isize 和 usize 两种类型为64位或者32位取决于程序所运行的计算机类型 {} {}", isize_var, usize_var);
+    println!("浮点类型：f32 f64 {} {}", f32_var, f64_var);
+    println!("布尔类型 bool {}", bool_var);
+    println!("字符类型(用单引号表示) char {}", c_var);
+    println!("字符串引用类型(用双引号表示) &str {}", str_var);
+    println!("元组类型 {} {}", tuple_var.0, tuple_var.1);
+    println!("数组类型 {} {} {}", arr_var[0], arr_var[1], another_arr[0]);
+    println!("容器类型 vec! {}", v[0]);
+    println!("字符串类型转整数类型: \"42\".parse().expect(msg=\"\") {}", u32_var_from_str);
+}
+
+fn rust_operator() {
+    println!("Rust 中的运算符");
+}
+
+fn rust_function() {
+    println!("Rust 中的函数");
 }
 
 fn rust_rand() {
@@ -111,7 +153,7 @@ fn test_trait() {
 }
 
 fn rust_expr() {
-
+    println!()
 }
 
 /* 主函数声明 */
@@ -148,6 +190,10 @@ fn main() {
     rust_variable();
     // Rust data type
     rust_datatype();
+    // Rust operator
+    rust_operator();
+    // Rust function
+    rust_function();
     // Rust expression
     rust_expr();
 }
