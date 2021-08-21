@@ -3,6 +3,11 @@ use std::cmp::Ordering;
 // use rand;
 // use front_of_house::hosting;
 
+struct Person {
+    name: String,
+    age: u8,
+}
+
 fn rust_keyword() {
     println!("Rust 中的关键字");
     println!("as - 强制类型转换，消除特定包含项的 trait 的歧义，或者对 use 和 extern crate 语句中的项重命名");
@@ -99,6 +104,7 @@ fn rust_datatype() {
     let bool_var: bool = true;
     let c_var: char = 'a';
     let str_var: &str = "xx";
+    let another_str_var: String = String::from("xx");
     let tuple_var: (i32, f32) = (1, 1.0);
     let arr_var: [i32; 4] = [1, 2, 3, 4];
     let another_arr = [0; 5];  // [0, 0, 0, 0, 0]
@@ -109,7 +115,7 @@ fn rust_datatype() {
     println!("浮点类型：f32 f64 {} {}", f32_var, f64_var);
     println!("布尔类型 bool {}", bool_var);
     println!("字符类型(用单引号表示) char {}", c_var);
-    println!("字符串引用类型(用双引号表示) &str {}", str_var);
+    println!("字符串引用类型(用双引号表示) &str {} {}", str_var, another_str_var);
     println!("元组类型 {} {}", tuple_var.0, tuple_var.1);
     println!("数组类型 {} {} {}", arr_var[0], arr_var[1], another_arr[0]);
     println!("容器类型 vec! {}", v[0]);
@@ -118,6 +124,51 @@ fn rust_datatype() {
 
 fn rust_operator() {
     println!("Rust 中的运算符");
+    // 宏展开
+    let a: Vec<u8> = vec![1, 2, 3];
+    let mut var = 1;
+    let foo = 1;
+    let bar = 1;
+    println!("宏展开运算符! {}", a[0]);
+    println!("按位非或者逻辑非 {}", !var);
+    println!("加法 + {}", foo + bar);
+    println!("减法 - {}", foo - bar);
+    println!("乘法 * {}", foo * bar);
+    println!("除法 / {}", foo / bar);
+    println!("算数取模 % {}", foo % bar);
+    println!("按位与 ^ {}", foo & bar);
+    println!("按位或 | {}", foo | bar);
+    println!("按位异或 ^ {}", foo ^ bar);
+    println!("逻辑与 {}", true && false);
+    println!("逻辑或 % {}", true || false);
+    println!("左移 << {}", foo << bar);
+    println!("右移 >> {}", foo >> bar);
+    println!("等于 == {}", foo == bar);
+    println!("不等 != {}", foo != bar);
+    println!("大于 > {}", foo > bar);
+    println!("大于等于 >= {}", foo >= bar);
+    println!("小于 < {}", foo < bar);
+    println!("小于等于 <= {}", foo <= bar);
+    println!("借用 &var {}", &var);
+    println!("可变借用 &mut var {}", &mut var);
+    println!("生命周期可变借用 &'a var");
+    println!("生命周期借用 &'a mut var");
+    println!("错误传播 expr?");
+    println!("模式绑定 expr @ pat");
+    println!("模式匹配 => ");
+    println!("范围 1..3");
+    println!("其余运算符 ..");
+    for i in 1..3 {
+        print!("{} ", i)
+    }
+    let person = Person {
+        name: String::from("Alice"),
+        age: 18,
+    };
+    let another_person = Person {
+        ..person
+    };
+    println!("{}", another_person.name)
 }
 
 fn rust_function() {
