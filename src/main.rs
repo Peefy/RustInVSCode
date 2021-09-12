@@ -1,5 +1,7 @@
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::fmt;
+use std::fs::File;
 // use rand;
 // use front_of_house::hosting;
 
@@ -553,6 +555,10 @@ fn rust_enum() {
         3 => println!("three"),
         _ => println!("other value"),
     }
+    // 可以使用 if let 语句直接从枚举中取值，类似 C# 类型的中的 is 类型强转 if (ss is String ss) {}
+    if let Some(ss) = some_string {
+        println!("some_string is a string enum type");
+    }
 }
 
 fn rust_module() {
@@ -586,17 +592,107 @@ fn rust_module() {
     print::print();
     alias_print::print();
     // use my_core::io::print::print;
-    use my_core::io::print::{print, print2};
     use my_core::io::print::*;
+    use my_core::io::print::{print, print2};
     print();
     print2();
+    // 使用外部软件包, Rust社区的成员已经在crates.io上提供了许多软件包
+    use rand::Rng;
+    let secret_number = rand::thread_rng().gen_range(1, 101);
+    println!("A secret number {:?}", secret_number);
+}
+
+fn rust_string() {
+    println!("Rust 中的字符串");
+    // 字符串是UTF-8编码的，因此可以在其中包含任何正确编码的数据
+    let data = "initial contents";
+    let s = data.to_string();
+    let mut b = "ss".to_string();
+    b.push_str("bar");
+    println!("{} {} {}", data, s, b);
+    let s1 = String::from("hello, ");
+    let s2 = String::from("world!");
+    let s3 = s1 + &s2; // note s1 has been moved here and can no longer be used
+    println!("{}", s2);
+    let s4 = format!("{}-{}", s2, s3);
+    println!("{}", s4);
+    for c in "ssss".chars() {
+        println!("{}", c);
+    }
 }
 
 fn rust_data_type() {
     println!("Rust 中的数据结构");
-    let mut v: Vec<i32> = vec![1, 2, 3];
-    v.push(0);
+    let v1 = Vec::<i32>::new();
+    let mut v2: Vec<i32> = vec![1, 2, 3];
+    v2.push(0);
+    println!("{:?} {:?}", v1, v2);
+    let third: &i32 = &v2[2];
+    println!("The third element is {}", third);
+    // 使用 [index] 和 get 方法均可获得引用
+    if let Some(v) = v2.get(2) {
+        println!("The third element is {}", v);
+    }
+    // 遍历容器中的值
+    let mut v = vec![100, 32, 57];
+    for i in &v {
+        println!("{}", i)
+    }
+    // 迭代对向量中元素的可变引用
+    for i in &mut v {
+        *i += 50;
+    }
     println!("{:?}", v);
+    #[derive(Debug)]
+    enum Spread {
+        Int(i64),
+        Float(f64),
+        Text(String),
+    }
+    let row = vec![
+        Spread::Int(3),
+        Spread::Text(String::from("blue")),
+        Spread::Float(10.12),
+    ];
+    println!("{:?}", row);
+    // Rust 哈希
+    let mut scores = HashMap::new();
+    scores.insert(String::from("blue"), 10);
+    scores.insert(String::from("yellow"), 50);
+    println!("{:?}", scores);
+    let teams = vec![String::from("1"), String::from("2")];
+    let scores = vec![10, 50];
+    let mut scores: HashMap<_, _> = teams.iter().zip(scores.iter()).collect();
+    println!("{:?}", scores);
+
+    let field_name = String::from("Favorite color");
+    let field_value = String::from("Blue");
+
+    let mut map = HashMap::new();
+    map.insert(field_name, field_value);
+    // field_name and field_value are invalid at this point, try using them and
+    // see what compiler error you get!
+    if let Some(score) = map.get(&String::from("blue")) {
+        println!("{}", score);
+    }
+    for (key, value) in &scores {
+        println!("{}: {}", key, value);
+    }
+    let text = "hello world wonderful world";
+
+    let mut map = HashMap::new();
+
+    for word in text.split_whitespace() {
+        let count = map.entry(word).or_insert(0);
+        *count += 1;
+    }
+
+    println!("{:?}", map);
+}
+
+fn rust_error_handling() {
+    println!("Rust 中的错误处理");
+    let f = File::open("hello.txt");
 }
 
 /* 主函数声明 */
@@ -652,6 +748,10 @@ fn main() {
     rust_enum();
     // Rust module
     rust_module();
+    // Rust string
+    rust_string();
     // Rust data type
     rust_data_type();
+    // Rust error handling
+    rust_error_handling();
 }

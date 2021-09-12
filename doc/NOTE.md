@@ -2118,6 +2118,7 @@ for i in &v {
 fn main() {
 let mut v = vec![100, 32, 57];
 for i in &mut v {
+    prin
     *i += 50;
 }
 }
@@ -2129,16 +2130,16 @@ for i in &mut v {
 
 #![allow(unused_variables)]
 fn main() {
-enum Spreadshe等ell {
+enum Spreadshell {
     Int(i32),
     Float(f64),
     Text(String),
 }
 
 let row = vec![
-    Spreadshe等ell::Int(3),
-    Spreadshe等ell::Text(String::from("blue")),
-    Spreadshe等ell::Float(10.12),
+    Spreadshell::Int(3),
+    Spreadshell::Text(String::from("blue")),
+    Spreadshell::Float(10.12),
 ];
 }
 
