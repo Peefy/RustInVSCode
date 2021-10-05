@@ -280,6 +280,41 @@ fn rust_match() {
         Ordering::Greater => println!("Too big!"),
         Ordering::Equal => println!("You win!"),
     }
+    // Rust 匹配守卫
+    let num = Some(4);
+    match num {
+        Some(x) if x < 5 => println!("less than five: {}", x),
+        Some(x) => println!("{}", x),
+        None => (),
+    };
+    let x = 4;
+    let y = false;
+    match x {
+        4 | 5 | 6 if y => println!("yes"),
+        _ => println!("no"),
+    }
+    let x = 1;
+    let y = 1;
+    // Use tuple to match multiple var
+    match (x, y) {
+        (1, 1) => println!("multiple match"),
+        _ => println!("no"),
+    }
+    enum Message {
+        Hello { id: i32 },
+    }
+    let msg = Message::Hello { id: 3 };
+    match msg {
+        Message::Hello { id: id_var @ 3..=7 } => {
+            println!("Found and id in range: {}", id_var);
+        }
+        Message::Hello { id: 10..=12 } => {
+            println!("Found an id in another range");
+        }
+        Message::Hello { id } => {
+            println!("Found some other id: {}", id);
+        }
+    }
 }
 
 fn test_trait() {
@@ -690,9 +725,536 @@ fn rust_data_type() {
     println!("{:?}", map);
 }
 
-fn rust_error_handling() {
+fn rust_clousure() {
+    println!("Rust 中的闭包");
+    fn add_one_v1(x: u32) -> u32 {
+        x + 1
+    }
+    let add_one_v2 = |x: u32| -> u32 { x + 1 };
+    let add_one_v3 = |x: u32| x + 1;
+    let add_one_v4 = |x: u32| x + 1;
+    // Rust 中的闭包 Trait
+    struct Cacher<T>
+    where
+        T: Fn(u32) -> u32,
+    {
+        calculation: T,
+        value: Option<u32>,
+    }
+    impl<T> Cacher<T>
+    where
+        T: Fn(u32) -> u32,
+    {
+        fn new(calculation: T) -> Cacher<T> {
+            Cacher {
+                calculation: calculation,
+                value: None,
+            }
+        }
+
+        fn value(&mut self, arg: u32) -> u32 {
+            match self.value {
+                Some(v) => v,
+                None => {
+                    let v = (self.calculation)(arg);
+                    self.value = Some(v);
+                    v
+                }
+            }
+        }
+    }
+    let mut result = Cacher::new(|num| num);
+    // 闭包捕获变量
+    let x = 4;
+    let equal_to_x = |z| z == x;
+    assert_eq!(equal_to_x(4), true);
+    // 使用 move 关键字获得变量 x 的所有权，当 x 没有实现 Copy Trait 时
+    let equal_to_x = move |z| z == x;
+    assert_eq!(equal_to_x(4), true);
+    println!("{}", x);
+}
+
+fn rust_iterator() {
+    println!("Rust 中的迭代器");
+    let v1 = vec![1, 2, 3];
+    // 注意 v1_iter 需要是可变的，在迭代器上调用 next 方法改变了迭代器中用来记录序列位置的状态
+    let mut v1_iter = v1.iter();
+    let total: i32 = v1_iter.sum();
+    assert_eq!(total, 6);
+    let mut v1_iter = v1.iter();
+    assert_eq!(v1_iter.next(), Some(&1));
+    assert_eq!(v1_iter.next(), Some(&2));
+    assert_eq!(v1_iter.next(), Some(&3));
+    assert_eq!(v1_iter.next(), None);
+    let v1 = vec![1, 2, 3];
+    let v2: Vec<i32> = v1.iter().map(|x| x + 1).collect();
+    assert_eq!(v2, vec![2, 3, 4]);
+    // 使用 filter 迭代器适配器和捕获环境的闭包
+    #[derive(PartialEq, Debug)]
+    struct Shoe {
+        size: u32,
+        style: String,
+    }
+    fn shoes_in_my_size(shoes: Vec<Shoe>, shoe_size: u32) -> Vec<Shoe> {
+        shoes.into_iter().filter(|s| s.size == shoe_size).collect()
+    }
+    let shoes = vec![
+        Shoe {
+            size: 10,
+            style: "a".to_string(),
+        },
+        Shoe {
+            size: 20,
+            style: "b".to_string(),
+        },
+        Shoe {
+            size: 30,
+            style: "c".to_string(),
+        },
+    ];
+    let in_my_size = shoes_in_my_size(shoes, 10);
+    println!("in my size: {:?}", in_my_size);
+    // 使用 Iterator trait 创建自定义迭代器
+    struct Counter {
+        count: u32,
+    }
+    impl Counter {
+        fn new() -> Counter {
+            Counter { count: 0 }
+        }
+    }
+    impl Iterator for Counter {
+        type Item = u32;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            self.count += 1;
+            if self.count < 6 {
+                Some(self.count)
+            } else {
+                None
+            }
+        }
+    }
+    let sum: u32 = Counter::new()
+        .zip(Counter::new().skip(1))
+        .map(|(a, b)| a * b)
+        .filter(|x| x % 3 == 0)
+        .sum();
+    assert_eq!(sum, 18);
+}
+
+fn rust_error_handling() -> Result<(), std::io::Error> {
     println!("Rust 中的错误处理");
     let f = File::open("hello.txt");
+    let file = match f {
+        Ok(file) => Some(file),
+        Err(error) => {
+            None
+            // panic!("Problem opening the file: {:?}", error);
+        }
+    };
+
+    use std::io::ErrorKind;
+
+    let f = File::open("hello.txt");
+    let file = match f {
+        Ok(file) => Some(file),
+        Err(error) => match error.kind() {
+            ErrorKind::NotFound => None,
+            other_kind => None,
+        },
+    };
+    /*
+    let f = File::open("hello.txt").unwrap_or_else(|err| {
+        File::create("hello.txt").unwrap()
+    });
+    */
+    println!("传播错误的捷径：? 运算符");
+    // 使用错误传播运算符可以将错误很方便地传递到上一层
+    let f = File::open("hello.txt")?;
+    Ok(())
+}
+
+fn rust_general_type_and_trait() {
+    println!("Rust 中的通用类型和 Trait");
+
+    trait TPoint: PartialOrd + Copy {}
+
+    #[derive(Eq, Clone)]
+    struct Person {
+        id: u32,
+        name: String,
+        height: u32,
+    }
+
+    impl PartialOrd for Person {
+        fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+            Some(self.cmp(other))
+        }
+    }
+
+    impl Ord for Person {
+        fn cmp(&self, other: &Self) -> Ordering {
+            self.height.cmp(&other.height)
+        }
+    }
+
+    impl PartialEq for Person {
+        fn eq(&self, other: &Self) -> bool {
+            self.height == other.height
+        }
+    }
+
+    struct Point<T> {
+        x: Box<T>,
+        y: Box<T>,
+    }
+
+    impl<T> Point<T> {
+        fn x(self) -> Box<T> {
+            self.x
+        }
+    }
+    impl Point<f32> {
+        fn distance(&self) -> f32 {
+            (self.x.powi(2) + self.y.powi(2)).sqrt()
+        }
+    }
+    // Trait: 定义共同的行为
+    trait Summary {
+        fn summarize(&self) -> String;
+    }
+    struct Article {
+        headline: String,
+    }
+    impl Summary for Article {
+        fn summarize(&self) -> String {
+            format!("headline: {}", self.headline)
+        }
+    }
+    // Trait 作为参数
+    fn notify(item: impl Summary) {}
+    // Trait 绑定语法
+    fn notify_two<T: Summary>(item: T) {}
+    // 使用 + 绑定多个 Trait
+    fn notify_three(T: impl Summary + Clone) {}
+    // 使用 where 约束
+    fn some_func<T, U>(t: T, u: U)
+    where
+        T: Clone,
+        U: std::fmt::Display,
+    {
+    }
+
+    fn largest<T: PartialOrd + Copy>(list: &[T]) -> T {
+        let mut largest = list[0];
+        for &item in list.iter() {
+            if item > largest {
+                largest = item
+            }
+        }
+
+        largest
+    }
+    let number_list = vec![0, 1, 2, 3, 4];
+    println!("The largest number is {}", largest(&number_list));
+    struct Pair<T> {
+        x: T,
+        y: T,
+    }
+    impl<T: std::fmt::Display + PartialOrd> Pair<T> {
+        fn cmp_display(&self) {
+            if self.x > self.y {
+                println!("x > y");
+            } else {
+                println!("x <= y");
+            }
+        }
+    }
+    // ToString Trait
+    println!("{}", 3.to_string());
+}
+
+fn rust_lifetime() {
+    println!("Rust 中的生命周期");
+    println!("Rust 中使用生命周期验证引用，比如不允许悬空引用");
+    /*
+    let r;         // 生命周期 'a
+    {
+        let x = 5;  // 生命周期 'b, 花括号内外是不同的生命周期
+        r = &x;  // x 的生命周期在离开花括号之后就结束了，会显式地销毁x，因此不能得到一个要销毁对象的引用
+    }
+    println!("{}", r);
+    */
+    println!("Rust 中存在一个借用检查器");
+    println!("Rust 中采用形如 'a 的语法定义一个生命周期参数，该语法不会改变任何引用的生命周期，像类型参数那样，通过制定生命周期参数，函数可以接受具有任何生命周期的引用");
+    println!("生命周期参数可以描述多个引用生命周期彼此的关系，但是不会影响任何生命周期");
+    println!("&i32 // a reference");
+    println!("&'a i32 // a reference with an explicit lifetime");
+    println!("&'a mut i32 // a mutable reference with an explicit lifetime");
+    println!("生命周期参数的定义方式与类型参数定义方式一样，始终需要在 impl 关键字之后定义生命周期参数, 因为生命周期是结构类型的一部分");
+    struct ImportantExcerpt<'a> {
+        part: &'a str,
+    }
+    impl<'a> ImportantExcerpt<'a> {
+        fn level(&self) -> i32 {
+            3
+        }
+        fn announce_and_return_part(&self, announcement: &str) -> &str {
+            println!("This is a annotation");
+            self.part
+        }
+    }
+    // 静态生命周期
+    let _s: &'static str = "The string has a static lifetime";
+    // 函数中指定泛型类型参数和生命周期的语法
+    fn _longest_with_announcement<'a, T>(x: &'a str, y: &'a str, _ann: T) -> &'a str {
+        if x.len() > y.len() {
+            x
+        } else {
+            y
+        }
+    }
+}
+
+fn rust_test() {
+    println!("Rust 中的测试");
+    #[cfg(test)]
+    mod tests {
+        #[test]
+        fn test_it_work() {
+            assert_eq!(2 + 2, 4);
+        }
+    }
+    // 可以使用 cargo test 进行测试
+}
+
+fn rust_smart_pointer() {
+    println!("Rust 中的智能指针");
+    println!("Rust 标准库中常用的三种智能指针");
+    println!("1. Box<T>: 用于在堆上分配内存值");
+    println!("2. Rc<T>: 一个引用计数类型，其数据可以有多个所有者，注意 Rc 只能适用于单线程场景，在多线程场景可以使用 Arc<T>");
+    println!("3. Ref<T> 和 RefMut<T>, 通过 RefCell<T> 访问，一个在运行时而不是在编译时执行借用规则的类型");
+    println!("Box<T> 允许创建递归类型，Rust 需要在编译时知道类型占用了多少空间，一种无法在编译时知道大小的类型是递归类型");
+    println!("Box<T> 类型是一个智能指针，因为它实现了 Deref trait (用于使用*运算符), 它允许 Box<T> 值被当作引用对待");
+    println!(
+        "当 Box<T> 值离开作用域时，由于 Box<T> 类型 Drop trait 实现，box 所指向的堆数据也会被清除"
+    );
+    let a = Box::new(1);
+    println!("a = {}", a);
+    enum List {
+        Cons(i32, Box<List>),
+        Nil,
+    }
+    use List::*;
+    let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));
+    println!("常规引用是一个指针类型，一种理解指针的方式就是将其看成指向存储在其他某处值的箭头");
+    let x = 5;
+    let y = &x;
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
+    // 像引用一样使用 Box<T>
+    let x = 5;
+    let y = Box::new(x);
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
+
+    use std::rc::Rc;
+    enum RcList {
+        RcCons(i32, Rc<RcList>),
+        RcNil,
+    }
+    use RcList::*;
+    let a = Rc::new(RcCons(5, Rc::new(RcCons(10, Rc::new(RcNil)))));
+    let b = RcCons(3, Rc::clone(&a));
+    let c = RcCons(4, Rc::clone(&a));
+    println!("内部可变性是 Rust 中的一个设计模式，它允许即使在有不可变引用时改变数据，这通常是借用规则所不允许的");
+    println!("通过 RefCell 在运行时检查借用规则");
+    println!("不同于 Rc<T>, RefCell<T> 代表其数据的唯一的所有权");
+    println!("* 在任意给定时间，只能拥有一个可变引用或任意数量的不可变引用之一(而不是全部)");
+    println!("* 引用必须总是有效的");
+    println!("三种智能指针 Box<T>, Rc<T>, RefCell<T> 的选择方式");
+    println!("* Rc<T> 允许相同数据有多个所有者；Box<T> 和 RefCell<T> 有单一所有者");
+    println!("* Box<T> 允许在编译时执行不可变或可变借用检查；Rc<T> 仅允许在编译时执行不可变借用检查；RefCell<T> 允许在运行时执行不可变或可变借用检查");
+    println!("* 因为 RefCell<T> 允许在运行时执行可变借用检查，所以在即便 RefCell<T> 自身是不可变的情况下修改其内部的值");
+    trait Messenger {
+        fn send(&self, msg: &str);
+    }
+    struct LimitTracker<'a, T: Messenger> {
+        messenger: &'a T,
+        value: usize,
+        max: usize,
+    }
+    impl<'a, T> LimitTracker<'a, T>
+    where
+        T: Messenger,
+    {
+        pub fn new(messenger: &T, max: usize) -> LimitTracker<T> {
+            LimitTracker {
+                messenger,
+                value: 0,
+                max,
+            }
+        }
+        pub fn set_value(&mut self, value: usize) {
+            self.value = value;
+            self.messenger.send("ABCDEFG");
+        }
+    }
+    use std::cell::RefCell;
+    struct MockMessenger {
+        sent_msgs: RefCell<Vec<String>>,
+    }
+    impl MockMessenger {
+        fn new() -> MockMessenger {
+            MockMessenger {
+                sent_msgs: RefCell::new(vec![]),
+            }
+        }
+    }
+    impl Messenger for MockMessenger {
+        fn send(&self, message: &str) {
+            self.sent_msgs.borrow_mut().push(String::from(message));
+            // 这个会在运行时检查是否借用了多次
+        }
+    }
+    println!("Rust 中的引用循环与内存泄漏");
+    println!(
+        "Rust 的内存安全保证使其难以意外地制造永远也不会被清理的内存(内存泄漏)，但并不是不可能。"
+    );
+    println!("与在编译时拒绝数据竞争不同，Rust并不保证完全地避免内存泄漏，这意味着内存泄漏在 Rust 被认为是安全的");
+    println!("这一点可以通过 Rc<T> 和 RefCell<T> 看出：创建引用循环的可能性是存在的");
+    println!("可以使用弱指针避免引用循环 Weak");
+    use std::rc::Weak;
+    #[derive(Debug)]
+    struct Node {
+        value: i32,
+        parent: RefCell<Weak<Node>>,
+        children: RefCell<Vec<Rc<Node>>>,
+    }
+    let leaf = Rc::new(Node {
+        value: 1,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![]),
+    });
+    let branch = Rc::new(Node {
+        value: 1,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![Rc::clone(&leaf)]),
+    });
+    *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
+}
+
+fn rust_concurrent() {
+    println!("Rust 中的并发");
+    use std::thread;
+    use std::time::Duration;
+    let handle = thread::spawn(|| {
+        for i in 1..10 {
+            println!("Hi number {} from the spwaned thread", i);
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+    for i in 1..5 {
+        println!("Hi number {} from the main thread", i);
+        thread::sleep(Duration::from_millis(1));
+    }
+    handle.join().unwrap();
+    // 线程与 Move 闭包
+    let v = vec![0, 1, 2];
+    let handle = thread::spawn(move || {
+        println!("Here's a vector: {:?}", v);
+    });
+    handle.join().unwrap();
+    // Rust channel
+    use std::sync::mpsc;
+    let (tx, rx) = mpsc::channel();
+    thread::spawn(move || {
+        let vals = vec![String::from("hi"), String::from("Hello")];
+        for val in vals {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+    for rec in rx {
+        println!("Got: {}", rec);
+    }
+    use std::sync::{Arc, Mutex};
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+    for handle in handles {
+        handle.join().unwrap();
+    }
+    println!("Result: {}", *counter.lock().unwrap());
+}
+
+fn rust_unsafe() {
+    println!("Rust 中的不安全代码");
+    println!("* 解引用裸指针");
+    println!("* 调用不安全的函数或方法");
+    println!("* 访问或修改可变静态变量");
+    println!("* 实现不安全的trait");
+    println!("* 访问union字段");
+    let mut num = 5;
+    let r1 = &num as *const i32;
+    let r2 = &mut num as *mut i32;
+    unsafe {
+        println!("r1 is {}", *r1);
+        println!("r1 is {}", *r2);
+    }
+    unsafe fn unsafe_func() {}
+    unsafe {
+        unsafe_func();
+    }
+    use std::slice;
+    let addr = 0x012345usize;
+    let r = addr as *mut i32;
+    let slice: &[i32] = unsafe { slice::from_raw_parts_mut(r, 10000) };
+    extern "C" {
+        fn abs(input: i32) -> i32;
+    }
+    unsafe {
+        println!("The abs value is {}", abs(-3));
+    }
+}
+
+fn rust_operator_overload() {
+    println!("Rust 中的运算符重载");
+    #[derive(Debug, PartialEq)]
+    struct Point {
+        x: i32,
+        y: i32,
+    }
+    use std::ops::Add;
+    impl Add for Point {
+        type Output = Point;
+        fn add(self, other: Point) -> Point {
+            Point {
+                x: self.x + other.x,
+                y: self.y + other.y,
+            }
+        }
+    }
+    assert_eq!(
+        Point { x: 1, y: 0 } + Point { x: 2, y: 3 },
+        Point { x: 3, y: 3 }
+    );
+    struct Mellimeters(u32);
+    struct Meters(u32);
+    impl Add<Meters> for Mellimeters {
+        type Output = Mellimeters;
+        fn add(self, other: Meters) -> Mellimeters {
+            Mellimeters(self.0 + (other.0 * 1000))
+        }
+    }
 }
 
 /* 主函数声明 */
@@ -752,6 +1314,24 @@ fn main() {
     rust_string();
     // Rust data type
     rust_data_type();
+    // Rust clousure
+    rust_clousure();
+    // Rust iterator
+    rust_iterator();
     // Rust error handling
-    rust_error_handling();
+    assert_eq!(rust_error_handling().is_ok(), false);
+    // Rust general type and trait
+    rust_general_type_and_trait();
+    // Rust lifetime
+    rust_lifetime();
+    // Rust test
+    rust_test();
+    // Rust smart pointer
+    rust_smart_pointer();
+    // Rust concurrent
+    rust_concurrent();
+    // Rust unsafe
+    rust_unsafe();
+    // Rust operator overload
+    rust_operator_overload();
 }
